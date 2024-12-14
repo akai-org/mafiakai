@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lobby View</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-800 text-white min-h-screen flex items-center justify-center">
+  <!-- Lobby Container -->
+  <div class="bg-gray-900 p-6 rounded-lg shadow-lg w-full max-w-md">
+    <!-- Room Code -->
+    <div class="text-center">
+      <h1 class="text-2xl font-bold mb-2">Room Code</h1>
+      <p id="room-code" class="text-xl bg-gray-700 py-2 px-4 rounded-md inline-block">ABCD1234</p>
+    </div>
+
+    <!-- Players List -->
+    <div class="mt-6">
+      <h2 class="text-lg font-semibold mb-2">Players in Room</h2>
+      <ul id="player-list" class="space-y-2">
+        <!-- Player names will be appended here dynamically -->
+      </ul>
+    </div>
+
+    <!-- Ready Button -->
+    <div class="mt-6 text-center">
+      <button id="ready-button" 
+        class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md">
+        Ready
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Sample player data
+    const players = ["Player1", "Player2", "Player3"];
+    const roomCode = "ABCD1234";
+
+    // Function to render players list
+    function renderPlayers() {
+      const playerList = document.getElementById("player-list");
+      playerList.innerHTML = ""; // Clear existing players
+
+      players.forEach((player, index) => {
+        const li = document.createElement("li");
+        li.className = "bg-gray-700 py-2 px-4 rounded-md flex justify-between items-center";
+        li.innerHTML = `
+          <span>${player}</span>
+          <span class="text-sm text-gray-400">#${index + 1}</span>
+        `;
+        playerList.appendChild(li);
+      });
+    }
+
+    // Function to handle Ready button click
+    function handleReady() {
+      const readyButton = document.getElementById("ready-button");
+      readyButton.innerText = "Waiting...";
+      readyButton.classList.remove("bg-green-500", "hover:bg-green-600");
+      readyButton.classList.add("bg-yellow-500", "hover:bg-yellow-600");
+    }
+
+    // Initialize the lobby
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("room-code").innerText = roomCode; // Set room code
+      renderPlayers(); // Render the player list
+
+      // Add Ready button click event
+      document.getElementById("ready-button").addEventListener("click", handleReady);
+    });
+  </script>
+</body>
+</html>

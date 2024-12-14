@@ -1,25 +1,25 @@
 {
-    "name": "mafiakai",
-    "version": "1.0.0",
-    "main": ".",
-    "scripts": {
-        "client:dev": "npm --prefix ./client run dev",
-        "server:dev": "npm --prefix ./server run dev",
-        "all:dev": "concurrently \"npm run client:dev\" & \"npm run server:dev\"",
-        "format:front": "prettier --write \"./client/src/**/*.{js,jsx,ts,tsx}\"",
-        "format:back": "prettier --write \"./server/src/**/*.{js,jsx,ts,tsx}\""
-    },
-    "repository": {
-        "type": "git",
-        "url": "."
-    },
-    "author": "",
-    "license": "ISC",
-    "description": "",
-    "dependencies": {
-        "concurrently": "^9.1.0"
-    },
-    "devDependencies": {
-        "prettier": "^3.4.2"
-    }
+  "name": "mafiakai",
+  "version": "1.0.0",
+  "main": ".",
+  "scripts": {
+    "client:dev": "npm --prefix ./client run dev",
+    "server:dev": "npm --prefix ./server run dev",
+    "all:dev": "concurrently \"npm run client:dev\" & \"npm run server:dev\"",
+    "format:front": "prettier --write \"./client/src/**/*.{js,jsx,ts,tsx}\"",
+    "format:back": "prettier --write \"./server/src/**/*.{js,jsx,ts,tsx}\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "."
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2"
+  }
 }

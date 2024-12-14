@@ -1,5 +1,5 @@
 import { ExtendedError } from "socket.io";
-import { MASocket } from "./types/Sockets";
+import { MASocket } from "@local/Sockets";
 
 // Connection validation
 export default function socketAuth(

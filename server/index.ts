@@ -1,11 +1,13 @@
 import express from "express";
 import http from "http";
 import { Server } from "socket.io";
-import webRoutes from "./src/webRoutes";
-import { MAServer } from "./types/Sockets";
+
+import { MAServer } from "@local/Sockets";
 import config from "./config";
-import socketRoutes from "./src/socketRoutes";
-import socketAuth from "./src/socketAuth";
+
+import webRoutes from "@/webRoutes";
+import socketRoutes from "@/socketRoutes";
+import socketAuth from "@/socketAuth";
 
 const app = express(); // Create an Express application
 

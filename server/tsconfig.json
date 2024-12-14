@@ -1,12 +1,20 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
+    "moduleResolution": "node",
+    "target": "ES2022",
+    "module": "ES2022",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@global/*": ["../types/*"],
+      "@local/*": ["./types/*"]
+    }
   },
-  "include": ["src/**/*", "index.ts"],
+  "include": ["types/*", "src/**/*", "index.ts", "../types/*"],
   "exclude": ["node_modules"]
 }

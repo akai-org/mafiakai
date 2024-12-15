@@ -1,11 +1,13 @@
-import express from 'express';
-import http from 'http';
-import { Server } from 'socket.io';
-import webRoutes from './src/webRoutes';
-import { MAServer } from './types/Sockets';
-import config from './config';
-import socketRoutes from './src/socketRoutes';
-import socketAuth from './src/socketAuth';
+import express from "express";
+import http from "http";
+import { Server } from "socket.io";
+
+import { MAServer } from "@local/Sockets";
+import config from "./config";
+
+import webRoutes from "@/webRoutes";
+import socketRoutes from "@/socketRoutes";
+import socketAuth from "@/socketAuth";
 
 const app = express(); // Create an Express application
 
@@ -15,14 +17,14 @@ const socketsServer: MAServer = new Server(); // Create a WebSocket server
 
 // Configure servers
 socketsServer.use(socketAuth).use(socketRoutes); // Configure the WebSocket server
-app.use('/', webRoutes); // Configure the HTTP server
+app.use("/", webRoutes); // Configure the HTTP server
 
 // Start servers
 socketsServer.listen(httpServer); // Start the WebSocket server
 app.listen(config.PORT, () =>
   console.log(
-    `Server is running on${'\x1b[34m'} http://${config.HOST}:${
+    `Server is running on${"\x1b[34m"} http://${config.HOST}:${
       config.PORT
-    }${'\x1b[0m'}`,
-  ),
+    }${"\x1b[0m"}`
+  )
 ); // Start the HTTP server

@@ -1,4 +1,4 @@
-import { MASocket } from "./types/Sockets";
+import { MASocket } from "@local/Sockets";
 
 export default function socketRoutes(socket: MASocket) {
   socket.on("vote", (data) => {

@@ -1,5 +1,5 @@
 function About() {
-  return <div>About</div>;
+  return <div>To jest projekt mafiaAKAI</div>;
 }
 
 export default About;

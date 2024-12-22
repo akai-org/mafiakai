@@ -1,7 +1,7 @@
 
 class RoomManager {
     rooms = new Map<string, Room>();
-    private playerIdCounter = 1;
+    private playerIdCounter = 1;    
 
     // unique 5 digits room code
     generateCode(): string { 

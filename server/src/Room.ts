@@ -15,4 +15,11 @@ export class Room {
   removePlayer(playerId: string) {
     this.players.delete(playerId);
   }
+  setPhase(newPhase: string) {
+    this.phase = newPhase;
+}
+
+  getPhase(): string {
+      return this.phase;
+  }
 }

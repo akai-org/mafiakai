@@ -20,7 +20,11 @@ webRouter.get("/room/:code", (req, res) => {
     return;
   }
 
-  res.json({ roomCode: room.code, playersInRoom: room.players.size });
+  res.json({ 
+    roomCode: room.code,
+    playersInRoom: room.players.size ,
+    phase: room.getPhase(),
+  });
 });
 
 export default webRouter;

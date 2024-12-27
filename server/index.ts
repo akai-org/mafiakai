@@ -26,6 +26,12 @@ const socketsServer: MAServer = new Server(httpServer,{
 socketsServer.on('connection',(socket)=>{
   console.log(socket.id);
 
+  socket.on("createRoom",(callback) => {
+    const code = manager.create();
+    callback(code);
+    socket.emit("rooms",Array.from(manager.rooms.keys()));
+  });
+
   socket.on("joinRoom", (code, position, callback) => {
     console.log(`${socket.id} joinRoom`);
     const room = manager.getRoom(code);

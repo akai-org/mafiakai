@@ -3,7 +3,7 @@ export interface Server2ClientEvents {
 }
 
 export interface Client2ServerEvents {
-  joinRoom: (code: string) => void;
+  joinRoom: (code: string, position: number) => void;
   vote: (data: string) => void;
 }
 

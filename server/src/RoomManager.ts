@@ -13,8 +13,8 @@ class RoomManager {
     return code;
   }
 
-  generatePlayerId(): string {
-    return `player-${this.playerIdCounter++}`;
+  generatePlayerId(): number {
+    return this.playerIdCounter++;
   }
 
   create(): string {

@@ -21,7 +21,7 @@ const socketsServer: MAServer = new Server(httpServer); // Create a WebSocket se
 socketsServer.on('connection',(socket)=>{
   console.log(socket.id);
 
-  socket.on("joinRoom", (code) => {
+  socket.on("joinRoom", (code, position) => {
     const room = manager.getRoom(code);
     if (room === undefined){
       socket.emit('info',`Room ${code} does not exist`);
@@ -31,8 +31,8 @@ socketsServer.on('connection',(socket)=>{
     
     socket.join(code);
     const playerid = manager.generatePlayerId();
-    room.addPlayer({name: playerid, id: playerid, role: Roles.REGULAR_CITIZEN});
-    socket.emit("info",`Added ${playerid} to room ${code}`);
+    room.addPlayerAt(position,{name: `player-${playerid}`, id: playerid, role: Roles.REGULAR_CITIZEN});
+    socket.emit("info",`Added player id=${playerid} to room ${code}`);
     socket.join(code+'-'+Phases.LOBBY);
   });
 })

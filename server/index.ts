@@ -29,6 +29,11 @@ socketsServer.on('connection',(socket)=>{
       return;
     }
     
+    if (!([Phases.LOBBY, Phases.POSITION_SELECTION, Phases.CHARACTER_SELECTION, Phases.ROLE_ASSIGNMENT, Phases.WELCOME].includes(room.phase))){
+      socket.emit('info',`Room ${code} does not accept new players currently`);
+      return 
+    }
+
     socket.join(code);
     const playerid = manager.generatePlayerId();
     room.addPlayerAt(position,{name: `player-${playerid}`, id: playerid, role: Roles.REGULAR_CITIZEN});

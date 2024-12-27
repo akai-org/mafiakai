@@ -16,7 +16,12 @@ const app = express(); // Create an Express application
 
 // Create servers
 const httpServer = http.createServer(app); // Create an HTTP server
-const socketsServer: MAServer = new Server(httpServer); // Create a WebSocket server
+const socketsServer: MAServer = new Server(httpServer,{
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  }
+}); // Create a WebSocket server
 
 socketsServer.on('connection',(socket)=>{
   console.log(socket.id);

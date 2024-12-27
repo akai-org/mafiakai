@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router";
-import { About, Home } from "./pages";
+import { About, Home, JoinRoom } from "./pages";
 
 function App() {
   return (
@@ -7,6 +7,7 @@ function App() {
       <Routes>
         <Route index element={<Home />} />
         <Route path="about" element={<About />} />
+        <Route path="join-room" element={<JoinRoom />} />
       </Routes>
     </BrowserRouter>
   );

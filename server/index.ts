@@ -21,24 +21,27 @@ const socketsServer: MAServer = new Server(httpServer); // Create a WebSocket se
 socketsServer.on('connection',(socket)=>{
   console.log(socket.id);
 
-  socket.on("joinRoom", (code, position) => {
+  socket.on("joinRoom", (code, position, callback) => {
+    console.log(`${socket.id} joinRoom`);
     const room = manager.getRoom(code);
     if (room === undefined){
-      socket.emit('info',`Room ${code} does not exist`);
-      // socket.disconnect();
+      // socket.emit('info',`Room ${code} does not exist`);
+      callback(`ERROR: Room ${code} does not exist`)
       return;
     }
     
     if (!([Phases.LOBBY, Phases.POSITION_SELECTION, Phases.CHARACTER_SELECTION, Phases.ROLE_ASSIGNMENT, Phases.WELCOME].includes(room.phase))){
-      socket.emit('info',`Room ${code} does not accept new players currently`);
-      return 
+      // socket.emit('info',`Room ${code} does not accept new players currently`);
+      callback(`ERROR: Room ${code} does not accept new players currently`);
+      return;
     }
 
     socket.join(code);
     const playerid = manager.generatePlayerId();
     room.addPlayerAt(position,{name: `player-${playerid}`, id: playerid, role: Roles.REGULAR_CITIZEN});
-    socket.emit("info",`Added player id=${playerid} to room ${code}`);
+    // socket.emit("info",`Added player id=${playerid} to room ${code}`);
     socket.join(code+'-'+Phases.LOBBY);
+    callback(`OK: Added player id=${playerid} to room ${code}`);
   });
 })
 

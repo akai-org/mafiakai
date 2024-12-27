@@ -10,13 +10,13 @@ export class Room {
     this.code = code;
   }
 
-  addPlayer(player: Player){
+  addPlayer(player: Player) {
     this.players.push(player);
   }
 
   addPlayerAt(playerId: number, player: Player) {
-    playerId = Math.max(playerId,this.players.length);
-    playerId = Math.min(playerId,0);
+    playerId = Math.max(playerId, this.players.length);
+    playerId = Math.min(playerId, 0);
 
     this.players.splice(playerId, 0, player);
   }

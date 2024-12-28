@@ -1,7 +1,7 @@
 import { Room } from "./Room";
 
 class RoomManager {
-  rooms = new Map<string, Room>();
+  rooms = new Map<string, Room>([["000000", new Room("000000")]]);
   private playerIdCounter = 1;
 
   // unique 5 digits room code

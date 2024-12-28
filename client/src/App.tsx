@@ -1,12 +1,23 @@
 import { BrowserRouter, Route, Routes } from "react-router";
-import { About, Home } from "./pages";
+
+import ConnectionProvider from "./ConnectionProvider";
+import Game from "./Game";
+import Home from "./Home";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route index element={<Home />} />
-        <Route path="about" element={<About />} />
+
+        <Route
+          path="room/:code"
+          element={
+            <ConnectionProvider>
+              <Game />
+            </ConnectionProvider>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

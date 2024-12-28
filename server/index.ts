@@ -5,26 +5,29 @@ import { Server } from "socket.io";
 import { MAServer } from "@local/Sockets";
 import config from "./config";
 
-import webRoutes from "@/webRoutes";
-import socketRoutes from "@/socketRoutes";
 import socketAuth from "@/socketAuth";
+import socketRoutes from "@/socketRoutes";
+import webRoutes from "@/webRoutes";
 
 const app = express(); // Create an Express application
 
 // Create servers
 const httpServer = http.createServer(app); // Create an HTTP server
-const socketsServer: MAServer = new Server(); // Create a WebSocket server
+
+// Create a WebSocket server
+const socketsServer: MAServer = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
+});
 
 // Configure servers
-socketsServer.use(socketAuth).use(socketRoutes); // Configure the WebSocket server
+socketsServer.use(socketAuth).on("connection", socketRoutes); // Configure the WebSocket server
 app.use("/", webRoutes); // Configure the HTTP server
 
 // Start servers
-socketsServer.listen(httpServer); // Start the WebSocket server
-app.listen(config.PORT, () =>
-  console.log(
-    `Server is running on${"\x1b[34m"} http://${config.HOST}:${
-      config.PORT
-    }${"\x1b[0m"}`
-  )
-); // Start the HTTP server
+httpServer.listen(config.PORT); // See https://socket.io/docs/v4/server-initialization/#with-express
+console.log(
+  `Server is running on${"\x1b[34m"} http://${config.HOST}:${config.PORT}${"\x1b[0m"}`
+);

@@ -1,30 +1,32 @@
 import clsx from "clsx";
-import type { ButtonProps } from "./types";
-import { baseStyles, sizeStyles, variantStyles } from "./constants";
+import type { HTMLAttributes } from "react";
+
+interface ButtonProps extends HTMLAttributes<HTMLButtonElement> {
+  children: React.ReactNode;
+  size?: "button-sm" | "button-md" | "button-lg";
+  variant?: "button-solid" | "button-outline";
+  disabled?: boolean;
+}
 
 function Button({
   children,
-  size = "md",
-  isDisabled,
-  variant = "solid",
+  variant = "button-solid",
+  size = "button-md",
+  disabled = false,
   className: customClassName,
-  fullwidth = false,
   ...rest
 }: ButtonProps) {
   return (
     <button
       className={clsx(
-        baseStyles,
-        variantStyles[variant],
-        sizeStyles[size],
-        fullwidth && "w-full",
-        isDisabled && "opacity-70",
+        "rounded-md font-bold",
+        variant,
+        size,
+        disabled && "opacity-70",
         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black",
         customClassName
       )}
       type="button"
-      disabled={isDisabled}
-      aria-disabled={isDisabled}
       {...rest}
     >
       {children}

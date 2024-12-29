@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { ConnContext } from "../ConnectionProvider/Context";
+import { ConnContext } from "@/ConnectionProvider/Context";
 import { Phases } from "@global/Game";
 
 function Game() {

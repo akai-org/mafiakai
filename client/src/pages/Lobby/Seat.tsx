@@ -14,21 +14,47 @@ const calcArrowPosition = (p: number, i: number, l: number) => {
   }
 };
 
-function Seat({ selectSeat, players }: { selectSeat(i: number): void; players: string[] }) {
-  const [position, setPosition] = useState<number>(0);
+function Seat({
+  selectSeat,
+  players,
+  yourSeat = null,
+}: {
+  selectSeat(i: number): void;
+  players: string[];
+  yourSeat: number | null;
+}) {
+  // Circle of seats
+  const seats = useMemo<({ id: number; name: string } | null)[]>(
+    () =>
+      new Array(players.length * 2 - (yourSeat !== null ? 2 : 0)).fill(null).map((_v, i) => {
+        const isFree = i % 2 === 0;
+        const playerId = Math.floor((i + 1) / 2);
+        if (yourSeat === null) return isFree ? null : { id: playerId - 1, name: players[playerId - 1] };
 
-  const handleArrow = useCallback(
-    (i: number) => setPosition((p) => calcArrowPosition(p, i, players.length * 2)),
-    [players]
+        const edge = yourSeat * 2;
+        if (i == edge + 0) return { id: playerId, name: players[playerId] };
+        if (i == edge + 1) return { id: playerId, name: players[playerId] };
+
+        if (isFree) return null;
+        else {
+          const edgedId = playerId - 1 + (i >= edge ? 1 : 0);
+          return { id: edgedId, name: players[edgedId] };
+        }
+      }),
+    [players, yourSeat]
   );
 
-  const arrow = useMemo(() => mod(position, players.length * 2), [position, players.length]);
+  // Arrow position
+  const [position, setPosition] = useState<number>(0);
+  const handleArrow = useCallback((i: number) => setPosition((p) => calcArrowPosition(p, i, seats.length)), [seats]);
+  const arrow = useMemo(() => mod(position, seats.length), [position, seats]);
 
   // paragraph
-  const playerId = useMemo(() => Math.floor(arrow / 2), [arrow]);
-  const player1 = players[playerId];
-  const player2 = players[(playerId + 1) % players.length];
+  const playerLeft = seats[mod(arrow + 1, seats.length)];
+  const playerCent = seats[arrow];
+  const playerRight = seats[mod(arrow - 1, seats.length)];
 
+  // Keyboard navigation
   useKeyDown({
     ArrowUp: () => handleArrow(arrow - 1),
     ArrowDown: () => handleArrow(arrow + 1),
@@ -38,11 +64,11 @@ function Seat({ selectSeat, players }: { selectSeat(i: number): void; players: s
     <div className="flex h-full flex-col justify-evenly p-4">
       <p className="h-8 text-center">
         {(() => {
-          if (arrow % 2 == 0) return `Here sits ${player1}`;
+          if (playerCent) return `Here sits ${playerCent.name}`;
 
-          if (player1 === player2) return `Free seat opposite ${player1}`;
+          if (playerLeft && playerLeft === playerRight) return `Free seat opposite ${playerLeft.name}`;
 
-          return `Free seat, on the left sits ${player2} and on the right sits ${player1}`;
+          return `Free seat, on the left sits ${playerLeft?.name} and on the right sits ${playerRight?.name}`;
         })()}
       </p>
 
@@ -50,45 +76,43 @@ function Seat({ selectSeat, players }: { selectSeat(i: number): void; players: s
         <div className="aspect-square w-4/5 rounded-full bg-neutral-300" />
 
         {/* Seats */}
-        {players.map((playerName, i) => {
-          const slctSeat = i === playerId && arrow % 2 === 1;
-          const slctPlay = i === playerId && arrow % 2 === 0;
-          return (
-            <>
+        {seats.map((player, i) => {
+          const slctSeat = i === arrow;
+          const slctYrSeat = player !== null && yourSeat === player.id;
+          return player !== null ? (
+            <div
+              key={player.name}
+              onMouseEnter={() => handleArrow(i)}
+              className="absolute flex aspect-square w-12 items-center justify-center rounded-full border-2 border-neutral-600 bg-neutral-300 p-2 transition-all"
+              style={{
+                transform:
+                  `rotate(${i / seats.length}turn) translateX(120px)` +
+                  (slctSeat ? "scale(1.5) translateX(50%) " : "") +
+                  `rotate(${-i / seats.length}turn)`,
+                zIndex: 1 - (i % 2),
+                backgroundColor: slctSeat || slctYrSeat ? "white" : "",
+              }}
+            >
+              {player.name[0]}
+            </div>
+          ) : (
+            <div
+              key={i + "seat"}
+              className="absolute flex aspect-square w-12 items-center justify-center"
+              style={{
+                transform: `rotate(${i / seats.length}turn) translateX(120px)`,
+                zIndex: 1 - (i % 2),
+              }}
+              onMouseEnter={() => handleArrow(i)}
+              onClick={() => selectSeat(seats[arrow + 1]?.id ?? 0)}
+            >
               <div
-                key={playerName}
-                onMouseEnter={() => handleArrow(i * 2)}
-                className="absolute flex aspect-square w-12 items-center justify-center rounded-full border-2 border-neutral-600 bg-neutral-300 p-2 transition-all"
+                className="aspect-square h-8 w-8 rounded-full border-2 border-neutral-400 transition-transform"
                 style={{
-                  transform:
-                    `rotate(${i / players.length}turn) translateX(120px)` +
-                    (slctPlay ? "scale(1.5) translateX(50%) " : "") +
-                    `rotate(${-i / players.length}turn)`,
-                  zIndex: 1 - (i % 2),
-                  backgroundColor: slctPlay ? "white" : "",
+                  transform: slctSeat ? "scale(1.5) translateX(15px)" : "",
                 }}
-              >
-                {playerName[0]}
-              </div>
-
-              <div
-                key={i + "seat"}
-                className="absolute flex aspect-square w-12 items-center justify-center"
-                style={{
-                  transform: `rotate(${(i * 2 + 1) / (players.length * 2)}turn) translateX(120px)`,
-
-                  zIndex: 1 - (i % 2),
-                }}
-                onMouseEnter={() => handleArrow(i * 2 + 1)}
-              >
-                <div
-                  className="aspect-square h-8 w-8 rounded-full border-2 border-neutral-400 transition-transform"
-                  style={{
-                    transform: slctSeat ? "scale(1.5) translateX(15px)" : "",
-                  }}
-                />
-              </div>
-            </>
+              />
+            </div>
           );
         })}
 
@@ -96,7 +120,7 @@ function Seat({ selectSeat, players }: { selectSeat(i: number): void; players: s
         <div
           className="absolute z-0 h-[2px] w-[calc(120px)] origin-left bg-neutral-600 transition-all"
           style={{
-            transform: `translateX(50%) rotate(${position / (players.length * 2)}turn)`,
+            transform: `translateX(50%) rotate(${position / seats.length}turn)`,
           }}
         />
 

@@ -1,8 +1,8 @@
 import { BrowserRouter, Route, Routes } from "react-router";
 
 import ConnectionProvider from "./ConnectionProvider";
-import Game from "./Game";
-import Home from "./Home";
+import Game from "./pages/Game";
+import Home from "./pages/Home";
 
 function App() {
   return (

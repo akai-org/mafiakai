@@ -1,3 +1,4 @@
+import { Button } from "@/components";
 import useKeyDown from "@/hooks/useKeyDown";
 import { mod } from "@/utils/mod";
 import { useCallback, useMemo, useState } from "react";
@@ -61,7 +62,7 @@ function Seat({
   });
 
   return (
-    <div className="flex h-full flex-col justify-evenly p-4">
+    <div className="flex h-full flex-col justify-between p-4">
       <p className="h-8 text-center">
         {(() => {
           if (playerCent) return `Here sits ${playerCent.name}`;
@@ -128,7 +129,7 @@ function Seat({
         <div className="absolute aspect-square h-2 rounded-full bg-neutral-800" />
       </div>
 
-      <button>Reserve your place</button>
+      <Button size="button-lg">Reserve your place</Button>
     </div>
   );
 }

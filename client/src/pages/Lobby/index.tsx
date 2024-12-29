@@ -26,7 +26,7 @@ function* names(): IterableIterator<string> {
 const namesGen = names();
 
 function Lobby() {
-  const [panelId, setPanel] = useState<number>(1);
+  const [panelId, setPanel] = useState<number>(0);
 
   const nextPanel = useCallback(() => setPanel((panelId + 1 + panelLenght) % panelLenght), [panelId]);
   const prevPanel = useCallback(() => setPanel((panelId - 1 + panelLenght) % panelLenght), [panelId]);

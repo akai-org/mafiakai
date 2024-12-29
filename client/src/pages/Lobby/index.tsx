@@ -12,8 +12,21 @@ enum Panels {
 const panelsValues = Object.values(Panels);
 const panelLenght = panelsValues.length;
 
+function* names(): IterableIterator<string> {
+  yield "Franek";
+  yield "Ula";
+  yield "Krzysiek";
+  yield "Rafał";
+  yield "Bartek";
+  yield "Iza";
+  yield "Jacek";
+  yield "Darek";
+}
+
+const namesGen = names();
+
 function Lobby() {
-  const [panelId, setPanel] = useState<number>(0);
+  const [panelId, setPanel] = useState<number>(1);
 
   const nextPanel = useCallback(() => setPanel((panelId + 1 + panelLenght) % panelLenght), [panelId]);
   const prevPanel = useCallback(() => setPanel((panelId - 1 + panelLenght) % panelLenght), [panelId]);
@@ -25,6 +38,22 @@ function Lobby() {
     ArrowRight: nextPanel,
   });
 
+  const [players, setPlayers] = useState<string[]>(["Paweł", "Maciek"]);
+
+  // TEST PURPOSES
+  const handleSetPosition = (i: number) => {
+    console.log(i);
+
+    const val = namesGen.next().value;
+    if (!val) return;
+
+    setPlayers((players) => {
+      const newPlayers = [...players];
+      newPlayers.splice(i, 0, val);
+      return newPlayers;
+    });
+  };
+
   return (
     <div className="flex h-full max-w-md flex-col border-2">
       <div className="flex justify-between p-4">
@@ -34,20 +63,20 @@ function Lobby() {
       </div>
 
       <div className="flex border-b-2 border-neutral-800">
-        {Object.values(Panels).map((p, i) => (
+        {Object.values(Panels).map((panelName, i) => (
           <button
             className={`w-full rounded-t-2xl py-1 transition-colors ${i === panelId ? "bg-neutral-800 text-white" : ""}`}
-            key={p}
             onClick={() => setPanel(i)}
+            key={panelName}
           >
-            {p}
+            {panelName}
           </button>
         ))}
       </div>
 
       <div className="h-full" ref={swipeRef}>
         {panelsValues[panelId] === Panels.Seat ? (
-          <Seat players={["Paweł", "Magda", "Ula", "Martyna", "Franek", "Darek"]} selectSeat={() => {}} />
+          <Seat players={players} selectSeat={handleSetPosition} yourSeat={null} />
         ) : (
           <></>
         )}

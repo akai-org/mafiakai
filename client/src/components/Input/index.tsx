@@ -1,6 +1,6 @@
-import React, { forwardRef } from "react";
+import { forwardRef, type ComponentPropsWithoutRef } from "react";
 
-type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
+type InputProps = ComponentPropsWithoutRef<"input">;
 
 const Input = forwardRef<HTMLInputElement, InputProps>(({ ...props }, ref) => (
   <input

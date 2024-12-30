@@ -27,6 +27,8 @@ function Button({
         customClassName
       )}
       type="button"
+      disabled={disabled}
+      aria-disabled={disabled}
       {...rest}
     >
       {children}

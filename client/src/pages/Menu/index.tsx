@@ -25,7 +25,7 @@ function Menu() {
           Enter code
           <Input value={code} onChange={handleChange} maxLength={6} type="text" />
         </label>
-        <Button onClick={handleJoinGame} disabled={code.length < 6} className="mt-4 w-full disabled:opacity-60">
+        <Button onClick={handleJoinGame} disabled={code.length < 6} className="mt-4 w-full">
           Join Game
         </Button>
         <div className="my-8 flex items-center justify-center">

@@ -1,27 +1,50 @@
-import { Phases } from "@global/Game";
+import { NON_STRICT_PHASES, Phases } from "@global/Game";
 import { Player } from "./Player";
 
 export class Room {
   code: string;
-  players: Array<Player> = new Array();
+  private players = new Map<number, Player>();
   phase: Phases = Phases.LOBBY;
 
   constructor(code: string) {
     this.code = code;
   }
 
-  addPlayer(player: Player) {
-    this.players.push(player);
-  }
-
-  addPlayerAt(playerId: number, player: Player) {
-    playerId = Math.max(playerId, this.players.length);
-    playerId = Math.min(playerId, 0);
-
-    this.players.splice(playerId, 0, player);
+  addPlayer(playerId: number, name: string) {
+    this.players.set(playerId, new Player(playerId, name));
   }
 
   removePlayer(playerId: number) {
-    delete this.players[playerId];
+    if (NON_STRICT_PHASES.includes(this.phase)) {
+      this.players.delete(playerId);
+    } else {
+      this.players.get(playerId)!.online = false;
+    }
+  }
+
+  hasPlayer(playerId: number) {
+    return this.players.has(playerId);
+  }
+
+  getPlayer(playerId: number) {
+    return this.players.get(playerId);
+  }
+
+  getPlayers() {
+    return Array.from(this.players.values());
+  }
+
+  setPlayerSeat(playerId: number, seat: number) {
+    for (const player of this.getPlayers()) {
+      if (player.seat && player.seat >= seat) player.seat++;
+    }
+
+    this.players.get(playerId)!.seat = seat;
+  }
+
+  getPlayersBySeat() {
+    return this.getPlayers()
+      .filter((player) => player.seat)
+      .sort((a, b) => a.seat! - b.seat!);
   }
 }

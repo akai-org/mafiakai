@@ -18,6 +18,6 @@ export interface InterServerEvents {
 }
 
 export interface SocketData {
-  name: string;
-  age: number;
+  playerId: number;
+  roomCode: string;
 }

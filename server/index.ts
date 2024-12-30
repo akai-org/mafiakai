@@ -28,6 +28,4 @@ app.use("/", webRoutes); // Configure the HTTP server
 
 // Start servers
 httpServer.listen(config.PORT); // See https://socket.io/docs/v4/server-initialization/#with-express
-console.log(
-  `Server is running on${"\x1b[34m"} http://${config.HOST}:${config.PORT}${"\x1b[0m"}`
-);
+console.log(`Server is running on${"\x1b[34m"} http://${config.HOST}:${config.PORT}${"\x1b[0m"}`);

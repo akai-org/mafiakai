@@ -2,22 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-.button-sm {
-  @apply border-2 px-6 py-2 text-sm;
-}
+@layer components {
+  .button-sm {
+    @apply border-2 px-6 py-2 text-sm;
+  }
 
-.button-md {
-  @apply border-2 px-8 py-2 text-base;
-}
+  .button-md {
+    @apply border-2 px-8 py-2 text-base;
+  }
 
-.button-lg {
-  @apply border-4 px-12 py-2 text-lg;
-}
+  .button-lg {
+    @apply border-4 px-12 py-2 text-lg;
+  }
 
-.button-solid {
-  @apply border-black bg-black text-white transition duration-200 ease-in-out hover:opacity-70 disabled:opacity-60;
-}
+  .button-solid {
+    @apply border-black bg-black text-white transition duration-200 ease-in-out hover:opacity-70 disabled:opacity-60;
+  }
 
-.button-outline {
-  @apply border-black bg-white text-black transition duration-200 ease-in-out hover:opacity-70 disabled:opacity-60;
+  .button-outline {
+    @apply border-black bg-white text-black transition duration-200 ease-in-out hover:opacity-70 disabled:opacity-60;
+  }
 }

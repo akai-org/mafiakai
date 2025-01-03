@@ -20,6 +20,11 @@ export default function socketRoutes(socket: MASocket) {
 
   room.addPlayer(player);
 
+  // generate persona for the player
+  const persona = generatePersona();
+
+  socket.emit("playerJoined", { player, persona })
+
   socket.on("vote", (data) => {
     socket.emit("info", `You voted for ${data}`);
   });

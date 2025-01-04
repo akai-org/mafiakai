@@ -4,6 +4,7 @@ export interface Server2ClientEvents {
   rooms: (rooms: Array<String>) => void;
   info: (data: string) => void;
   phaseChange: (phase: Phases) => void;
+  playerJoined: (data: { player: any; persona: any }) => void;
 }
 
 export type ResponseHandler = (message: string) => void;

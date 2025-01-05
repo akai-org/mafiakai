@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useParams } from "react-router";
-import { ConnContext } from "./Context";
+import { ConnContext } from "./ConnContext";
 import { socket } from "@/constants";
 
 function ConnectionProvider(props: { children: React.ReactNode }) {

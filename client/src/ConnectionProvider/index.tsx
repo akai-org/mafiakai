@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useParams } from "react-router";
-import { ConnContext, socket } from "./Context";
+import { ConnContext } from "./Context";
+import { socket } from "@/constants";
 
 function ConnectionProvider(props: { children: React.ReactNode }) {
   // Get the code from the URL

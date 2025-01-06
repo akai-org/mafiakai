@@ -1,28 +1,14 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useParams } from "react-router";
-import { ConnContext } from "./ConnContext";
+import { ConnContext } from "./ConnectionContext";
 import { socket } from "@/constants";
 import { connect, disconnect } from "./utils";
+import useConnection from "./useConnection";
 
 function ConnectionProvider(props: { children: React.ReactNode }) {
   // Get the code from the URL
   const { code } = useParams();
-
-  // Create a socket connection
-  useEffect(() => {
-    if (code === undefined) return;
-
-    socket.on("connect", () => console.log("Connected to server"));
-    socket.on("connect_error", (err) => console.error(err));
-    socket.on("disconnect", () => console.log("Disconnected from server"));
-    socket.on("info", (data) => console.info(data));
-
-    connect({ code, id: "0", name: "Player" });
-
-    return () => {
-      disconnect();
-    };
-  }, [code]);
+  useConnection(code);
 
   const contextValue = useMemo(() => ({ socket, connect, disconnect }), []);
 

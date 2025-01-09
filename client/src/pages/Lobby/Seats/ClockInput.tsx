@@ -3,6 +3,7 @@
 
 import useCircleCapture from "@/hooks/useCircleCapture";
 import { mod } from "@/utils/mod";
+import clsx from "clsx";
 import { Children, useEffect, useMemo, useState, type PropsWithChildren } from "react";
 
 /**
@@ -46,9 +47,12 @@ export default function ClockInput(
         return (
           <div
             key={i + "bubble"}
-            className="pointer-events-none absolute aspect-square w-[12%] transition-transform"
+            className={clsx(
+              "pointer-events-none absolute aspect-square transition-transform",
+              props.length < 24 ? "w-[12%]" : "w-[10%]"
+            )}
             style={{
-              transform: ` rotate(${i / props.length}turn) translate(310%) ${arrow === i ? "translateX(50%)" : ""} rotate(${-i / props.length}turn)`,
+              transform: ` rotate(${i / props.length}turn) ${props.length < 24 ? "translate(310%)" : "translate(390%)"} ${arrow === i ? "translateX(50%)" : ""} rotate(${-i / props.length}turn)`,
               zIndex: 2 - ((i + 0) % 2),
             }}
           >

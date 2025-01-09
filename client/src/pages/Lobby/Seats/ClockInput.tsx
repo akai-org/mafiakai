@@ -3,8 +3,16 @@
 
 import useCircleCapture from "@/hooks/useCircleCapture";
 import { mod } from "@/utils/mod";
-import { Children, useEffect, useMemo, useState, type PropsWithChildren } from "react";
+import { Children, useCallback, useEffect, useMemo, useState, type PropsWithChildren } from "react";
 
+/**
+ * Input shaped like a clock, with a pointer that can be moved around the clock face.
+ * @param pointer - pointer position
+ * @param onChange - callback when pointer position changes
+ * @param length - number of positions
+ * @param onClick - callback when clock face is clicked
+ * @param children - elements to be placed on the clock face, they will be placed evenly around the clock face
+ */
 export default function ClockInput(
   props: PropsWithChildren<{
     onChange?: (pointer: number) => void;
@@ -41,7 +49,7 @@ export default function ClockInput(
             className="pointer-events-none absolute aspect-square w-[12%] transition-transform"
             style={{
               transform: ` rotate(${i / props.length}turn) translate(310%) ${arrow === i ? "translateX(50%)" : ""} rotate(${-i / props.length}turn)`,
-              zIndex: 2 - ((i + 1) % 2),
+              zIndex: 2 - ((i + 0) % 2),
             }}
           >
             {child}

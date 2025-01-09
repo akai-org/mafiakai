@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useRef, useState, type RefCallback } from "react";
 
+/**
+ * This hook captures the position of the mouse or touch event on the circle element.
+ * @param slides Number of panels that the circle is divided into.
+ * @param degreesOffset Offset in degrees.
+ * @returns [ref, currentSlide] - ref should be attached to the circle element, currentSlide is the current panel.
+ */
 export default function useCircleCapture<E extends HTMLElement>(
   slides: number,
   degreesOffset: number = 0
@@ -20,37 +26,43 @@ export default function useCircleCapture<E extends HTMLElement>(
     [slides, degreesOffset]
   );
 
-  const handleMouseMove = useCallback(
-    function (this: HTMLElement, e: MouseEvent) {
+  useEffect(() => {
+    if (!ref.current) return;
+
+    const handleMouseUp = (e: MouseEvent) => e.stopPropagation();
+    const handleMouseMove = function (this: HTMLElement, e: MouseEvent) {
+      e.stopPropagation();
+
       const cx = e.offsetX - this.offsetWidth / 2;
       const cy = e.offsetY - this.offsetHeight / 2;
       handlePosition(cx, cy);
-    },
-    [handlePosition]
-  );
+    };
 
-  const handleTouchMove = useCallback(
-    function (this: HTMLElement, e: TouchEvent) {
+    const handleTouchEnd = (e: TouchEvent) => e.stopPropagation();
+    const handleTouchMove = function (this: HTMLElement, e: TouchEvent) {
+      e.stopPropagation();
+
       const touch = e.touches[0];
       const { x, y } = this.getBoundingClientRect();
       const cx = touch.clientX - x - this.offsetWidth / 2;
       const cy = touch.clientY - y - this.offsetHeight / 2;
       handlePosition(cx, cy);
-    },
-    [handlePosition]
-  );
-
-  useEffect(() => {
-    if (!ref.current) return;
+    };
 
     ref.current.addEventListener("mousemove", handleMouseMove);
+    ref.current.addEventListener("mouseup", handleMouseUp);
+
     ref.current.addEventListener("touchmove", handleTouchMove);
+    ref.current.addEventListener("touchend", handleTouchEnd);
 
     return () => {
       ref.current?.removeEventListener("mousemove", handleMouseMove);
+      ref.current?.removeEventListener("mouseup", handleMouseUp);
+
       ref.current?.removeEventListener("touchmove", handleTouchMove);
+      ref.current?.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [handleMouseMove, handleTouchMove]);
+  }, [handlePosition]);
 
   return [
     (el) => {

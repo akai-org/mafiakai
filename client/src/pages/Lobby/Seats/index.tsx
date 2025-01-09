@@ -2,11 +2,11 @@ import { Button } from "@/components";
 import useKeyDown from "@/hooks/useKeyDown";
 import { useCallback, useMemo, useState } from "react";
 
+import { mod } from "@/utils/mod";
+import ClockInput from "./ClockInput";
 import FreeBubble from "./FreeBubble";
 import Paragraph from "./Paragraph";
 import PlayerBubble from "./PlayerBubble";
-import ClockInput from "./ClockInput";
-import { mod } from "@/utils/mod";
 
 interface PlayerSeat {
   id: number;
@@ -39,6 +39,7 @@ function Seat(props: { selectSeat(i: number): void; players: string[]; yourSeat:
 
   const handleSelectSeat = useCallback(() => {
     const playerNext = seats[pointer + 1];
+
     if (playerNext) props.selectSeat(playerNext.id);
   }, [props, pointer, seats]);
 
@@ -47,8 +48,6 @@ function Seat(props: { selectSeat(i: number): void; players: string[]; yourSeat:
     ArrowUp: () => setPointer((p) => mod(p - 1, seats.length)),
     ArrowDown: () => setPointer((p) => mod(p + 1, seats.length)),
   });
-
-  console.log(pointer);
 
   return (
     <div className="flex h-full flex-col justify-between p-4">
@@ -61,8 +60,7 @@ function Seat(props: { selectSeat(i: number): void; players: string[]; yourSeat:
             const slctYrSeat = player !== null && props.yourSeat === player.id;
 
             return player === null ? (
-              // <FreeBubble key={i} isSelected={isSelected} />
-              ""
+              <FreeBubble key={i} isSelected={isSelected} />
             ) : (
               <PlayerBubble key={i} isSelected={isSelected} isYourSeat={slctYrSeat} name={player.name} />
             );

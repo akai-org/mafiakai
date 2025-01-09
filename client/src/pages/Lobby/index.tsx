@@ -1,7 +1,7 @@
 import useSwipe from "@/hooks/useSwipe";
 import { useCallback, useState } from "react";
 import Character from "./Character";
-import Seat from "./Seat";
+import Seat from "./Seats";
 import useKeyDown from "@/hooks/useKeyDown";
 
 enum Panels {
@@ -21,17 +21,26 @@ function* names(): IterableIterator<string> {
   yield "Iza";
   yield "Jacek";
   yield "Darek";
+  yield "Kuba";
+  yield "Kasia";
+  yield "Asia";
+  yield "Ola";
 }
 
 const namesGen = names();
 
 function Lobby() {
-  const [panelId, setPanel] = useState<number>(0);
+  const [panelId, setPanel] = useState<number>(1);
 
   const nextPanel = useCallback(() => setPanel((panelId + 1 + panelLenght) % panelLenght), [panelId]);
   const prevPanel = useCallback(() => setPanel((panelId - 1 + panelLenght) % panelLenght), [panelId]);
 
-  const swipeRef = useSwipe({ onSwipeLeft: nextPanel, onSwipeRight: prevPanel }, 50);
+  const swipeRef = useSwipe(
+    {
+      // onSwipeLeft: nextPanel, onSwipeRight: prevPanel
+    },
+    50
+  );
 
   useKeyDown({
     ArrowLeft: prevPanel,
@@ -42,8 +51,6 @@ function Lobby() {
 
   // TEST PURPOSES
   const handleSetPosition = (i: number) => {
-    console.log(i);
-
     const val = namesGen.next().value;
     if (!val) return;
 
@@ -76,7 +83,7 @@ function Lobby() {
 
       <div className="h-full" ref={swipeRef}>
         {panelsValues[panelId] === Panels.Seat ? (
-          <Seat players={players} selectSeat={handleSetPosition} yourSeat={null} />
+          <Seat players={players} selectSeat={handleSetPosition} yourSeat={1} />
         ) : (
           <></>
         )}

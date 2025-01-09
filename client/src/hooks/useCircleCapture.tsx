@@ -1,4 +1,9 @@
-import { useCallback, useEffect, useRef, useState, type RefCallback } from "react";
+import { useEffect, useMemo, useRef, useState, type RefCallback } from "react";
+
+interface Point {
+  x: number;
+  y: number;
+}
 
 /**
  * This hook captures the position of the mouse or touch event on the circle element.
@@ -11,20 +16,18 @@ export default function useCircleCapture<E extends HTMLElement>(
   degreesOffset: number = 0
 ): [RefCallback<E>, number] {
   const ref = useRef<E | null>(null);
-  const [slide, setSlide] = useState<number>(0);
 
-  const handlePosition = useCallback(
-    (cx: number, cy: number) => {
-      // calculate angle in radians
-      const rad = Math.atan2(cy, cx);
-      const degrees = (rad * 180) / Math.PI + 360;
-      const shift = (degrees + degreesOffset) % 360;
+  const [mousePosition, setMousePosition] = useState<Point>({ x: 0, y: 0 });
 
-      // calculate slide
-      setSlide(Math.floor((shift / 360) * slides));
-    },
-    [slides, degreesOffset]
-  );
+  const slide = useMemo(() => {
+    // calculate angle in radians
+    const rad = Math.atan2(mousePosition.y, mousePosition.x);
+    const degrees = (rad * 180) / Math.PI + 360;
+    const shift = (degrees + degreesOffset) % 360;
+
+    // calculate slide
+    return Math.floor((shift / 360) * slides);
+  }, [mousePosition, slides, degreesOffset]);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -35,7 +38,7 @@ export default function useCircleCapture<E extends HTMLElement>(
 
       const cx = e.offsetX - this.offsetWidth / 2;
       const cy = e.offsetY - this.offsetHeight / 2;
-      handlePosition(cx, cy);
+      setMousePosition({ x: cx, y: cy });
     };
 
     const handleTouchEnd = (e: TouchEvent) => e.stopPropagation();
@@ -46,7 +49,7 @@ export default function useCircleCapture<E extends HTMLElement>(
       const { x, y } = this.getBoundingClientRect();
       const cx = touch.clientX - x - this.offsetWidth / 2;
       const cy = touch.clientY - y - this.offsetHeight / 2;
-      handlePosition(cx, cy);
+      setMousePosition({ x: cx, y: cy });
     };
 
     ref.current.addEventListener("mousemove", handleMouseMove);
@@ -62,12 +65,11 @@ export default function useCircleCapture<E extends HTMLElement>(
       ref.current?.removeEventListener("touchmove", handleTouchMove);
       ref.current?.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [handlePosition]);
+  }, [ref]);
 
   return [
     (el) => {
-      if (!el) return;
-      ref.current = el;
+      if (el) ref.current = el;
     },
     slide,
   ];

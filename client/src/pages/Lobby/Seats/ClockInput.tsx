@@ -3,7 +3,7 @@
 
 import useCircleCapture from "@/hooks/useCircleCapture";
 import { mod } from "@/utils/mod";
-import { Children, useCallback, useEffect, useMemo, useState, type PropsWithChildren } from "react";
+import { Children, useEffect, useMemo, useState, type PropsWithChildren } from "react";
 
 /**
  * Input shaped like a clock, with a pointer that can be moved around the clock face.

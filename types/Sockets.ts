@@ -3,7 +3,7 @@ import type { Phases } from "./Game";
 export interface Server2ClientEvents {
   rooms_data: (rooms: Array<String>) => void;
   conn_info_data: (data: ConnectionInfoData) => void;
-  phase_updated: (data: { err: string; phase: Phases }) => void;
+  phase_updated: (phase: Phases) => void;
 }
 
 export type ConnectionInfoData = { playerId: string };

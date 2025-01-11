@@ -9,11 +9,7 @@ function Game() {
   const [phase, setPhase] = useState(Phases.GAME_END);
 
   useEffect(() => {
-    socket.on("phase_updated", ({ err, phase }) => {
-      if (err) {
-        console.error("Error in phase_updated occured: " + err);
-        return;
-      }
+    socket.on("phase_updated", (phase) => {
       setPhase(phase);
     });
   }, [socket]);

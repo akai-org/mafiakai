@@ -3,6 +3,7 @@ import { manager } from "@/constants";
 
 // Here we set up the socket events for the client
 export default function socketRoutes(socket: MASocket) {
+  //TODO: Should player be assigned to socket room too?
   const room = manager.getRoom(socket.data.roomCode)!;
   const playerId = socket.data.playerId;
 

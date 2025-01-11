@@ -2,11 +2,13 @@ import useSwipe from "@/hooks/useSwipe";
 import { useCallback, useState } from "react";
 import Character from "./Character";
 import Seat from "./Seat";
+import Waiting from "./Waiting";
 import useKeyDown from "@/hooks/useKeyDown";
 
 enum Panels {
   Character = "Character",
   Seat = "Seat",
+  Waiting = "Waiting",
 }
 
 const panelsValues = Object.values(Panels);
@@ -81,6 +83,7 @@ function Lobby() {
           <></>
         )}
         {panelsValues[panelId] === Panels.Character ? <Character /> : <></>}
+        {panelsValues[panelId] === Panels.Waiting ? <Waiting /> : <></>}
       </div>
     </div>
   );

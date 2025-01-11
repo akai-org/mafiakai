@@ -18,6 +18,6 @@ export default function socketRoutes(socket: MASocket) {
   }
 
   socket.on("disconnect", () => {
-    room?.removePlayer(playerId);
+    room?.disconnectPlayer(playerId);
   });
 }

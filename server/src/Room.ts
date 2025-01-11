@@ -14,7 +14,7 @@ export class Room {
     this.players.set(playerId, new Player(playerId));
   }
 
-  removePlayer(playerId: string) {
+  disconnectPlayer(playerId: string) {
     if (NON_STRICT_PHASES.includes(this.phase)) {
       this.players.delete(playerId);
     } else {

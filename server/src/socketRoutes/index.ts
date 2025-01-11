@@ -7,10 +7,6 @@ export default function socketRoutes(socket: MASocket) {
   const room = manager.getRoom(socket.data.roomCode);
   const playerId = socket.data.playerId;
 
-  console.log("conn_info_data", {
-    sessionId: socket.data.playerId,
-  });
-
   socket.emit("conn_info_data", {
     playerId: socket.data.playerId,
   });

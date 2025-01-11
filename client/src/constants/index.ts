@@ -1,5 +1,5 @@
 import { socket } from "./socket";
 
-const SID_KEY_NAME = "session_id";
+const PLAYER_ID_KEY_NAME = "player_id";
 
-export { socket, SID_KEY_NAME };
+export { socket, PLAYER_ID_KEY_NAME };

@@ -1,8 +1,8 @@
 import { Room } from "./Room";
+import crypto from "node:crypto";
 
 class RoomManager {
   rooms = new Map<string, Room>([["000000", new Room("000000")]]);
-  private playerIdCounter = 1;
 
   // unique 5 digits room code
   generateCode(): string {
@@ -14,7 +14,7 @@ class RoomManager {
   }
 
   generatePlayerId(): string {
-    return (this.playerIdCounter++).toString();
+    return crypto.randomUUID();
   }
 
   create(): string {

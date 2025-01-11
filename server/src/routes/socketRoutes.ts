@@ -1,5 +1,5 @@
-import { MASocket } from "@local/Sockets";
-import { manager } from "../RoomManager";
+import { MASocket } from "@/types";
+import { manager } from "@/constants";
 
 // Here we set up the socket events for the client
 export default function socketRoutes(socket: MASocket) {

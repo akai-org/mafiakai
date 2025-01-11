@@ -1,6 +1,6 @@
 import { ExtendedError } from "socket.io";
-import { MASocket } from "@local/Sockets";
-import { manager } from "./RoomManager";
+import { MASocket } from "@/types";
+import { manager } from "@/constants";
 import { NON_STRICT_PHASES } from "@global/Game";
 
 /*

@@ -1,7 +1,7 @@
 import { Room } from "./Room";
 import crypto from "node:crypto";
 
-class RoomManager {
+export class RoomManager {
   rooms = new Map<string, Room>([["000000", new Room("000000")]]);
 
   // unique 5 digits room code
@@ -28,5 +28,3 @@ class RoomManager {
     return this.rooms.get(code);
   }
 }
-
-export const manager = new RoomManager();

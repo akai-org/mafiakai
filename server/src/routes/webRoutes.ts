@@ -1,5 +1,5 @@
 import express from "express";
-import { manager } from "./RoomManager";
+import { manager } from "@/constants";
 
 const webRouter = express.Router();
 

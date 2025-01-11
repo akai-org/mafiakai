@@ -5,12 +5,6 @@ export type CustomSocket = Socket<Server2ClientEvents, Client2ServerEvents>;
 
 export interface ConnectionContext {
   socket: CustomSocket;
-  connect: (queryParams: SocketQueryParams) => void;
+  connect: (roomCode: string) => void;
   disconnect: () => void;
-}
-
-export interface SocketQueryParams {
-  code: string;
-  name: string;
-  id: string;
 }

@@ -1,10 +1,17 @@
-import { socket } from "@/constants";
-import type { SocketQueryParams } from "@/types/Socket";
+import { SID_KEY_NAME, socket } from "@/constants";
 
-const connect = (queryParams: SocketQueryParams) => {
+const connect = (roomCode: string) => {
   if (socket.connected) return;
 
-  socket.io.opts.query = queryParams;
+  const playerId = localStorage.getItem(SID_KEY_NAME);
+
+  if (playerId) {
+    socket.auth = { playerId };
+  }
+
+  console.log(`socket.auth: ${JSON.stringify(socket.auth)} playerId: ${playerId}`);
+
+  socket.io.opts.query = { roomCode };
   socket.connect();
 };
 

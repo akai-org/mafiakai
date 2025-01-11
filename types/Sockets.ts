@@ -1,11 +1,12 @@
 import type { Phases } from "./Game";
 
 export interface Server2ClientEvents {
-  rooms: (rooms: Array<String>) => void;
-  info: (data: string) => void;
-  phaseChange: (phase: Phases) => void;
+  rooms_data: (rooms: Array<String>) => void;
+  conn_info_data: (data: ConnectionInfoData) => void;
+  phase_updated: (data: { err: string; phase: Phases }) => void;
 }
 
+export type ConnectionInfoData = { playerId: string };
 export type ResponseHandler = (message: string) => void;
 
 export interface Client2ServerEvents {
@@ -18,6 +19,6 @@ export interface InterServerEvents {
 }
 
 export interface SocketData {
-  playerId: number;
+  playerId: string;
   roomCode: string;
 }

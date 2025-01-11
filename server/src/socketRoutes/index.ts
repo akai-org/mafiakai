@@ -1,25 +1,27 @@
 import { MASocket } from "@local/Sockets";
 import { manager } from "../RoomManager";
-import { Player } from "../Player";
-import { Roles } from "@global/Roles";
-import { Phases } from "@global/Game";
+import { NON_STRICT_PHASES } from "@global/Game";
 
 // Here we set up the socket events for the client
 export default function socketRoutes(socket: MASocket) {
-  const room = manager.getRoom(socket.data.roomCode)!;
-  const playerid = socket.data.playerId;
+  const room = manager.getRoom(socket.data.roomCode);
+  const playerId = socket.data.playerId;
 
-  socket.emit("phaseChange", room.phase);
+  console.log("conn_info_data", {
+    sessionId: socket.data.playerId,
+  });
 
-  socket.emit(
-    "info",
-    JSON.stringify({
-      playerId: playerid,
-      roomCode: room.code,
-    })
-  );
+  socket.emit("conn_info_data", {
+    playerId: socket.data.playerId,
+  });
+
+  if (!room) {
+    socket.emit("phase_updated", { err: "Room is not found", phase: NON_STRICT_PHASES[0] });
+  } else {
+    socket.emit("phase_updated", { err: "", phase: room.phase });
+  }
 
   socket.on("disconnect", () => {
-    room.removePlayer(playerid);
+    room?.removePlayer(playerId);
   });
 }

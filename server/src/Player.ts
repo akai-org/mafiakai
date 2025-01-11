@@ -8,7 +8,7 @@ export class Player {
   seat: number | null = null;
 
   constructor(
-    public id: number, // Unique identifier for the player
-    public name: string // Real name of the player
+    public id: string // Unique identifier for the player
+    // public name: string // Real name of the player
   ) {}
 }

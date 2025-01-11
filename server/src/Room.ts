@@ -3,18 +3,18 @@ import { Player } from "./Player";
 
 export class Room {
   code: string;
-  private players = new Map<number, Player>();
+  private players = new Map<string, Player>();
   phase: Phases = Phases.LOBBY;
 
   constructor(code: string) {
     this.code = code;
   }
 
-  addPlayer(playerId: number, name: string) {
-    this.players.set(playerId, new Player(playerId, name));
+  addPlayer(playerId: string) {
+    this.players.set(playerId, new Player(playerId));
   }
 
-  removePlayer(playerId: number) {
+  removePlayer(playerId: string) {
     if (NON_STRICT_PHASES.includes(this.phase)) {
       this.players.delete(playerId);
     } else {
@@ -22,11 +22,11 @@ export class Room {
     }
   }
 
-  hasPlayer(playerId: number) {
+  hasPlayer(playerId: string) {
     return this.players.has(playerId);
   }
 
-  getPlayer(playerId: number) {
+  getPlayer(playerId: string): Player | undefined {
     return this.players.get(playerId);
   }
 
@@ -34,7 +34,7 @@ export class Room {
     return Array.from(this.players.values());
   }
 
-  setPlayerSeat(playerId: number, seat: number) {
+  setPlayerSeat(playerId: string, seat: number) {
     for (const player of this.getPlayers()) {
       if (player.seat && player.seat >= seat) player.seat++;
     }

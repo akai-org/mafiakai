@@ -1,7 +1,7 @@
 import { ExtendedError } from "socket.io";
 import { MASocket } from "@local/Sockets";
 import { manager } from "./RoomManager";
-import { NON_STRICT_PHASES, Phases } from "@global/Game";
+import { NON_STRICT_PHASES } from "@global/Game";
 
 /*
  Validate connection and Join player to room
@@ -11,10 +11,8 @@ import { NON_STRICT_PHASES, Phases } from "@global/Game";
   - id - old player id or 0 for new player
 */
 export default function socketAuth(socket: MASocket, next: (err?: ExtendedError) => void) {
-  // VALIDATING
-
   // Code
-  const code = socket.handshake.query.code;
+  const code = socket.handshake.query.roomCode;
   if (code === undefined) return next(new Error("Invalud code provided"));
   if (typeof code !== "string") return next(new Error("Invalid code provided"));
 
@@ -22,34 +20,37 @@ export default function socketAuth(socket: MASocket, next: (err?: ExtendedError)
   const room = manager.getRoom(code);
   if (room === undefined) return next(new Error(`Room ${code} does not exist`));
 
-  // Player Name
-  const name = socket.handshake.query.name;
-  if (name === undefined) return next(new Error("Invalid player name provided"));
-  if (typeof name !== "string") return next(new Error("Invalid player name provided"));
+  console.log(room);
 
-  // Player Id
-  const id = socket.handshake.query.id;
-  if (id === undefined) return next(new Error("Invalid player id provided"));
-  if (typeof id !== "string") return next(new Error("Invalid player id provided"));
+  const playerId = socket.handshake.auth.playerId;
+  // const session = sessionStore.findSession(sessionId);
 
-  let playerId = parseInt(id);
-  if (isNaN(playerId)) return next(new Error("Invalid player id provided"));
+  //console.log(`server-side socketAuth. sid: ${sessionId}`);
+  console.log("hanshake id: " + playerId);
+  console.log(JSON.stringify(room.getPlayers()));
 
-  // JOINING ROOM
-
-  // Join as new player
-  if (NON_STRICT_PHASES.includes(room.phase)) {
-    // Create new player
-    playerId = manager.generatePlayerId();
-    room.addPlayer(playerId, name);
-
+  // Join as old player
+  if (room.hasPlayer(playerId)) {
+    console.log("JOIN AS OLD PLAYER");
     socket.data = { playerId, roomCode: code };
     return next();
   }
 
-  // Join as old player
-  if (room.hasPlayer(playerId)) {
-    socket.data = { playerId, roomCode: code };
+  // Join as new player
+  if (NON_STRICT_PHASES.includes(room.phase)) {
+    console.log("JOIN AS NEW PLAYER");
+    //  const newSessionId = manager.genSessionId();
+    const newPlayerId = manager.generatePlayerId();
+    room.addPlayer(newPlayerId); //creates new player and assigns to room
+    //   console.log(room.hasPlayer(newPlayerId));
+    //  sessionStore.saveSession(newSessionId, {
+    //  playerId: newPlayerId,
+    //});
+    // console.log(sessionStore.findSession(newSessionId)?.playerId === newPlayerId);
+
+    socket.data = { playerId: newPlayerId, roomCode: code };
+    console.log("room: " + JSON.stringify(room.getPlayers()));
+
     return next();
   }
 

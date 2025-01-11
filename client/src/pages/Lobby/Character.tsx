@@ -1,6 +1,9 @@
 import { Button, Input } from "@/components";
+import { ConnContext } from "@/features/connection";
+import { useContext } from "react";
 
 function Character() {
+  const { disconnect, connect } = useContext(ConnContext);
   return (
     <form className="flex h-full w-full flex-col justify-between p-4" onSubmit={(e) => e.preventDefault()}>
       <div className="flex w-full flex-col gap-y-4">
@@ -47,7 +50,15 @@ function Character() {
         </div>
       </div>
 
-      <Button size="button-lg">Draw my character</Button>
+      <Button
+        size="button-lg"
+        onClick={() => {
+          disconnect();
+          connect("000000");
+        }}
+      >
+        Draw my character
+      </Button>
     </form>
   );
 }

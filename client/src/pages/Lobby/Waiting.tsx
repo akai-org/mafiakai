@@ -18,9 +18,8 @@ function DisplayPlayers(props: { players: string[] }) {
   );
 }
 
-function Waiting(props: { playername: string []}) {
-    {/*Temporary player name*/}
-    const playername = "Tomek"; 
+function Waiting(props: { playername: string[] }) {
+    const playername = props.playername[0];
   return (
     <div className="flex h-full w-full flex-col justify-between p-4">
       <p>Be patient {playername}, the citizens are getting ready...</p>

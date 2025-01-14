@@ -1,37 +1,60 @@
 import { Button } from "@/components";
 
-function isReady(ready: boolean) {
-  return <div className={`mr-2 h-5 w-5 rounded-full ${ready ? "bg-gradient-to-tr from-green-500 to-green-700" : "bg-gradient-to-tr from-red-500 to-red-700"}`}></div>;
+type PlayerInfo = {
+  name: string;
+  seat: number | null;
+  isReady: boolean;
+};
+
+type DisplayPlayersProps = {
+  players: string[];
+};
+
+type WaitingProps = {
+  playername: string[];
+};
+
+function ReadyIndicator({ ready }: { ready: boolean }) {
+  return <div className={`mr-2 h-5 w-5 rounded-full ${ready ? "bg-green-600" : "bg-red-600"}`}></div>;
 }
 
-function DisplayPlayers(props: { players: string[] }) {
+function DisplayPlayers({ players }: DisplayPlayersProps) {
   return (
     <ul>
-        {/* Temporary loop from diversity in ready state */}
-      {props.players.map((name, i) => {
+      {players.map((name, i) => {
         const ready = i % 2 === 0;
         return (
-          <li className={`flex items-center my-4 text-lg ${ready ? "text-black" : "text-gray-500"}`}>{isReady(ready)}{name}</li>
+          <li key={i} className={`my-4 flex items-center text-lg ${!ready ? "text-gray-500" : ""}`}>
+            <ReadyIndicator ready={ready} />
+            {name}
+          </li>
         );
       })}
     </ul>
   );
 }
 
-function Waiting(props: { playername: string[] }) {
-    const playername = props.playername[0];
+function Waiting({ playername }: WaitingProps) {
+  const player: PlayerInfo = { name: playername[0], seat: null, isReady: false };
   return (
     <div className="flex h-full w-full flex-col justify-between p-4">
-      <p>Be patient {playername}, the citizens are getting ready...</p>
+      <p>Be patient {player.name}, the citizens are getting ready...</p>
       <div className="flex flex-col gap-y-4">
-        <DisplayPlayers players={["Tomek", "Kasia", "Marek", "Krzysztof", "Ania", "Michał", "Natalia"]}></DisplayPlayers>
+        {/* Example names */}
+        <DisplayPlayers
+          players={[player.name, "Kasia", "Marek", "Krzysztof", "Ania", "Michał", "Natalia"]}
+        ></DisplayPlayers>
       </div>
-    <div className="relative group">
-        <Button size="button-lg" disabled className="w-full">Ready</Button>
-        <span className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded-md py-1 px-2">
-            Please create your character and choose a seat first
+      <div className="group relative">
+        <Button size="button-lg" disabled={!player.name || player.seat === null} className="w-full">
+          Ready
+        </Button>
+        <span
+          className={`${!player.name || player.seat === null ? "absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white group-hover:block" : "hidden"}`}
+        >
+          Please create your character and choose a seat first
         </span>
-    </div>
+      </div>
     </div>
   );
 }

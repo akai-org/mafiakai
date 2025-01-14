@@ -83,7 +83,7 @@ function Lobby() {
           <></>
         )}
         {panelsValues[panelId] === Panels.Character ? <Character /> : <></>}
-        {panelsValues[panelId] === Panels.Waiting ? <Waiting /> : <></>}
+        {panelsValues[panelId] === Panels.Waiting ? <Waiting playername={players} /> : <></>}
       </div>
     </div>
   );

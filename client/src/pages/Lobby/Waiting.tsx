@@ -24,7 +24,10 @@ function DisplayPlayers({ players }: DisplayPlayersProps) {
       {players.map((name, i) => {
         const ready = i % 2 === 0;
         return (
-          <li key={i} className={`my-4 flex items-center text-lg ${!ready ? "text-gray-500" : ""}`}>
+          <li
+            key={i}
+            className={`my-4 flex items-center text-lg transition-all hover:ml-2 hover:text-xl hover:font-semibold ${!ready ? "text-gray-500" : ""}`}
+          >
             <ReadyIndicator ready={ready} />
             {name}
           </li>
@@ -39,18 +42,38 @@ function Waiting({ playername }: WaitingProps) {
   return (
     <div className="flex h-full w-full flex-col justify-between p-4">
       <p>Be patient {player.name}, the citizens are getting ready...</p>
-      <div className="flex flex-col gap-y-4">
-        {/* Example names */}
+      <div className="flex max-h-[calc(100vh-200px)] flex-col overflow-y-auto rounded-md bg-neutral-100 px-4 shadow-inner">
         <DisplayPlayers
-          players={[player.name, "Kasia", "Marek", "Krzysztof", "Ania", "Michał", "Natalia"]}
-        ></DisplayPlayers>
+          players={[
+            player.name,
+            "Kasia",
+            "Marek",
+            "Krzysztof",
+            "Ania",
+            "Michał",
+            "Natalia",
+            "Piotr",
+            "Karolina",
+            "Tomasz",
+            "Klaudia",
+            "Kamil",
+            "Monika",
+            "Jakub",
+            "Magda",
+            "Adam",
+            "Ewa",
+            "Robert",
+            "Agnieszka",
+            "Łukasz",
+          ]}
+        />
       </div>
-      <div className="group relative">
+      <div className="group relative mt-2">
         <Button size="button-lg" disabled={!player.name || player.seat === null} className="w-full">
           Ready
         </Button>
         <span
-          className={`${!player.name || player.seat === null ? "absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white group-hover:block" : "hidden"}`}
+          className={`transition-opacity duration-300 ${!player.name || player.seat === null ? "visibility-hidden group-hover:visibility-visible absolute bottom-full left-1/2 mb-2 -translate-x-1/2 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100" : "hidden"}`}
         >
           Please create your character and choose a seat first
         </span>

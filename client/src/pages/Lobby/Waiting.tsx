@@ -42,7 +42,7 @@ function Waiting({ playername }: WaitingProps) {
   return (
     <div className="flex h-full w-full flex-col justify-between p-4">
       <p>Be patient {player.name}, the citizens are getting ready...</p>
-      <div className="flex max-h-[calc(100vh-200px)] flex-col overflow-y-auto rounded-md bg-neutral-100 px-4 shadow-inner">
+      <div className="flex max-h-[calc(100vh-220px)] flex-col overflow-y-auto rounded-md bg-neutral-100 px-4 shadow-inner">
         <DisplayPlayers
           players={[
             player.name,

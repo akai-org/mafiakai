@@ -40,7 +40,7 @@ function DisplayPlayers({ players }: DisplayPlayersProps) {
 function Waiting({ playername }: WaitingProps) {
   const player: PlayerInfo = { name: playername[0], seat: null, isReady: false };
   return (
-    <div className="flex h-full w-full flex-col justify-between">
+    <div className="flex h-full w-full flex-col justify-between p-4">
       <p className="flex-shrink-0 text-base">Be patient {player.name}, the citizens are getting ready...</p>
       <div className="my-2 flex max-h-[calc(100vh-16rem)] flex-col overflow-y-auto rounded-md bg-neutral-100 px-4 shadow-inner">
         <DisplayPlayers

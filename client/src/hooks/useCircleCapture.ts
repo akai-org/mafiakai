@@ -9,7 +9,7 @@ interface Point {
  * This hook captures the position of the mouse or touch event on the circle element.
  * @param slides Number of panels that the circle is divided into.
  * @param degreesOffset Offset in degrees.
- * @returns [ref, currentSlide] - ref should be attached to the circle element, currentSlide is the current panel.
+ * @returns [ref, currentSlide, currentMove] - ref should be attached to the circle element, currentSlide is the current panel.
  */
 export default function useCircleCapture<E extends HTMLElement>(
   slides: number,

@@ -1,8 +1,7 @@
 import { mod } from "@/utils/mod";
+import type { Seat } from ".";
 
-type Player = { id: number; name: string };
-
-export default function Paragraph(props: { seats: (Player | null)[]; arrow: number }) {
+export default function Paragraph(props: { seats: Seat[]; arrow: number; yourSeat: number | null }) {
   const playerLeft = props.seats[mod(props.arrow + 1, props.seats.length)];
   const playerCent = props.seats[props.arrow];
   const playerRight = props.seats[mod(props.arrow - 1, props.seats.length)];
@@ -10,6 +9,8 @@ export default function Paragraph(props: { seats: (Player | null)[]; arrow: numb
   return (
     <p className="h-8 text-center">
       {(() => {
+        if (playerCent && props.yourSeat === props.arrow) return `You are sitting here`;
+
         if (playerCent) return `Here sits ${playerCent.name}`;
 
         if (playerLeft && playerRight && playerLeft.id === playerRight.id)

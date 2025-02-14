@@ -22,10 +22,12 @@ function Button({
         "rounded-md font-bold",
         variant,
         size,
-        disabled && "opacity-70",
+        disabled && "opacity-60",
         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black",
         customClassName
       )}
+      disabled={disabled}
+      aria-disabled={disabled}
       type="button"
       {...rest}
     >

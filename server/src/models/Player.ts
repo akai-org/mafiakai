@@ -6,10 +6,9 @@ export class Player {
   persona: Persona = {};
   role: Roles | null = null;
   seat: number | null = null;
+  name: string | null = null; // Real name of the player
 
   constructor(
     public id: string // Unique identifier for the player
-    //TODO: handle player name on client and server
-    // public name: string // Real name of the player
   ) {}
 }

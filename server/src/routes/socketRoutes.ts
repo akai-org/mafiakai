@@ -16,4 +16,8 @@ export default function socketRoutes(socket: MASocket) {
   socket.on("disconnect", () => {
     room?.disconnectPlayer(playerId);
   });
+
+  socket.on("send_player_name", (playerName) => {
+    room.getPlayer(playerId)!.name = playerName;
+  });
 }

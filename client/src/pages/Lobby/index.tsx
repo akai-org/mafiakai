@@ -4,6 +4,7 @@ import Character from "./Character";
 import Seat from "./Seat";
 import useKeyDown from "@/hooks/useKeyDown";
 import { Button, Input, Modal } from "@/components";
+import { socket } from "@/constants";
 
 enum Panels {
   Character = "Character",
@@ -59,13 +60,20 @@ function Lobby() {
   const [isModalOpened, setIsModalOpened] = useState(true);
   const playerNameLength = playerName?.trim().length;
 
+  const handleNameConfirmation = () => {
+    if (playerNameLength > 1) {
+      socket.emit("send_player_name", playerName);
+      setIsModalOpened(false);
+    }
+  };
+
   return (
     <>
       <Modal canBeDismissed={false} showCloseIcon={false} isOpened={isModalOpened}>
         <h2 className="mt-3 text-2xl font-bold">Enter your name</h2>
         <p className="text-center">This will help other players bind your name with your character.</p>
         <Input type="text" value={playerName} onChange={(e) => setPlayerName(e.target.value)} className="my-2" />
-        <Button disabled={!(playerNameLength > 1)} onClick={() => playerNameLength > 1 && setIsModalOpened(false)}>
+        <Button disabled={!(playerNameLength > 1)} onClick={handleNameConfirmation}>
           Confirm
         </Button>
       </Modal>

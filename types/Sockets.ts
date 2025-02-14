@@ -12,6 +12,7 @@ export type ResponseHandler = (message: string) => void;
 export interface Client2ServerEvents {
   setPosition: (position: number, callback: ResponseHandler) => void;
   vote: (data: string) => void;
+  send_player_name: (playerName: string) => void;
 }
 
 export interface InterServerEvents {

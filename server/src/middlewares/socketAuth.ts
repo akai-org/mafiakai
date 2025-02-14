@@ -7,8 +7,7 @@ import { NON_STRICT_PHASES } from "@global/Game";
  Validate connection and Join player to room
  To establish a connection, the client must provide:
   - code - the room code
-  - name - the player name
-  - id - old player id or 0 for new player
+  - id - old player id or undefined
 */
 export default function socketAuth(socket: MASocket, next: (err?: ExtendedError) => void) {
   // Code

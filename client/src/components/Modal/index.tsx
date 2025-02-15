@@ -39,9 +39,9 @@ function Modal({ onClose, showCloseIcon = true, canBeDismissed = true, children,
       ref={dialogRef}
       onKeyDown={handleKeyDown}
       onClick={handleBackdropClick}
-      className="rounded-md backdrop:bg-black/70 backdrop:backdrop-blur-sm"
+      className="mx-2 max-w-lg rounded-md bg-white backdrop:bg-black/70 backdrop:backdrop-blur-sm sm:mx-auto"
     >
-      <div className="flex max-w-lg flex-col items-center justify-center gap-3 bg-white p-8">
+      <div className="flex flex-col items-center justify-center gap-3 p-8">
         {showCloseIcon && (
           <button onClick={handleModalClose} className="absolute right-6 top-5 aspect-square w-6">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -2,13 +2,12 @@ import { BrowserRouter, Route, Routes } from "react-router";
 
 import ConnectionProvider from "./ConnectionProvider";
 import { GameScreen, MenuScreen } from "@/pages";
-import Lobby from "./pages/Lobby";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route index element={<Lobby />} />
+        <Route index element={<MenuScreen />} />
 
         <Route
           path="room/:code"

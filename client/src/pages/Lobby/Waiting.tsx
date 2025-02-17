@@ -20,7 +20,7 @@ function ReadyIndicator({ ready }: { ready: boolean }) {
 
 function DisplayPlayers({ players }: DisplayPlayersProps) {
   return (
-    <ul>
+    <ul className="select-none">
       {players.map((name, i) => {
         const ready = i % 2 === 0;
         return (

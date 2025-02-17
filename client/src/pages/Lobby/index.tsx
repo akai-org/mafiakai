@@ -1,7 +1,7 @@
 import useSwipe from "@/hooks/useSwipe";
 import { useCallback, useState } from "react";
 import Character from "./Character";
-import Seat from "./Seat";
+import Seat from "./Seats";
 import Waiting from "./Waiting";
 import useKeyDown from "@/hooks/useKeyDown";
 

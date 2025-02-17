@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
-import { ConnContext } from "@/ConnectionProvider/Context";
+import { ConnContext } from "../../ConnectionProvider/Context";
 import { Phases } from "@global/Game";
+import Lobby from "@/pages/Lobby";
 
 function Game() {
   const { socket } = useContext(ConnContext);
@@ -12,11 +13,14 @@ function Game() {
   }, [socket]);
 
   // Render certain components based on the game phase
-  return (
-    <div>
-      <h1>Room is in phase {phase}</h1>
-    </div>
-  );
+
+  switch (phase) {
+    case Phases.LOBBY:
+      return <Lobby />;
+
+    default:
+      return <div>Placeholder for phase {phase}</div>;
+  }
 }
 
 export default Game;

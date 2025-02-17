@@ -18,8 +18,8 @@ function Seat(props: { selectSeat(i: number): void; players: string[]; yourSeat:
 
   // Keyboard navigation
   useKeyDown({
-    ArrowUp: () => setPointer((p) => mod(p - 1, props.players.length)),
-    ArrowDown: () => setPointer((p) => mod(p + 1, props.players.length)),
+    ArrowUp: () => setPointer((p) => mod(p - 1, seats.length)),
+    ArrowDown: () => setPointer((p) => mod(p + 1, seats.length)),
   });
 
   return (

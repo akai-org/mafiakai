@@ -39,11 +39,11 @@ function Lobby() {
   useKeyDown({ ArrowLeft: prevPanel, ArrowRight: nextPanel });
 
   // TEST PURPOSES for Seats component
-  const [players, setPlayers] = useState<string[]>(["Paweł", "Maciek"]);
+  const [players, setPlayers] = useState<string[]>(["Paweł", "Maciek", "Kuba", "Asia", "Ola"]);
+
   const handleSetPosition = (i: number) => {
     const val = namesGen.next().value;
     if (!val) return;
-
     setPlayers((players) => {
       const newPlayers = [...players];
       newPlayers.splice(i, 0, val);

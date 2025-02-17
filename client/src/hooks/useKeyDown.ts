@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-export type Keys = "ArrowLeft" | "ArrowRight" | "ArrowUp" | "ArrowDown";
+export type Keys = "ArrowLeft" | "ArrowRight" | "ArrowUp" | "ArrowDown" | "Enter";
 
 export default function useKeyDown(handlers: Partial<Record<Keys, () => void>>): void {
   useEffect(() => {

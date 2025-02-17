@@ -2,6 +2,7 @@
 // useEffect deps are fine, the linter is wrong
 
 import useCircleCapture from "@/hooks/useCircleCapture";
+import useKeyDown from "@/hooks/useKeyDown";
 import { mod } from "@/utils/mod";
 import clsx from "clsx";
 import { useEffect, useMemo, useState } from "react";
@@ -53,6 +54,10 @@ export default function ClockInput<V>(props: {
     const playerNext = props.labels[valueMod + 1];
     if (playerNext && props.onSelect) props.onSelect(playerNext);
   };
+
+  useKeyDown({
+    Enter: handleSelectSeat,
+  });
 
   return (
     <div className="relative flex h-full w-full items-center justify-center">

@@ -1,7 +1,8 @@
-import clsx from "clsx";
-import React, { forwardRef } from "react";
 
-type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
+import clsx from "clsx";
+import React, { forwardRef, type ComponentPropsWithoutRef } from "react";
+
+type InputProps = ComponentPropsWithoutRef<"input">;
 
 const Input = forwardRef<HTMLInputElement, InputProps>(({ className, ...props }, ref) => (
   <input

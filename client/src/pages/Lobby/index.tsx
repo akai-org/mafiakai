@@ -1,7 +1,8 @@
 import useSwipe from "@/hooks/useSwipe";
 import { useCallback, useState } from "react";
 import Character from "./Character";
-import Seat from "./Seat";
+import Seat from "./Seats";
+import Waiting from "./Waiting";
 import useKeyDown from "@/hooks/useKeyDown";
 import { Button, Input, Modal } from "@/components";
 import { socket } from "@/constants";
@@ -9,6 +10,7 @@ import { socket } from "@/constants";
 enum Panels {
   Character = "Character",
   Seat = "Seat",
+  Waiting = "Waiting",
 }
 
 const panelsValues = Object.values(Panels);
@@ -23,32 +25,29 @@ function* names(): IterableIterator<string> {
   yield "Iza";
   yield "Jacek";
   yield "Darek";
+  yield "Kuba";
+  yield "Kasia";
+  yield "Asia";
+  yield "Ola";
 }
 
 const namesGen = names();
 
 function Lobby() {
-  const [panelId, setPanel] = useState<number>(0);
-
-  const nextPanel = useCallback(() => setPanel((panelId + 1 + panelLenght) % panelLenght), [panelId]);
+  // Handle panels
+  const [panelId, setPanel] = useState<number>(1);
   const prevPanel = useCallback(() => setPanel((panelId - 1 + panelLenght) % panelLenght), [panelId]);
+  const nextPanel = useCallback(() => setPanel((panelId + 1 + panelLenght) % panelLenght), [panelId]);
 
-  const swipeRef = useSwipe({ onSwipeLeft: nextPanel, onSwipeRight: prevPanel }, 50);
+  const swipeRef = useSwipe({ onSwipeLeft: prevPanel, onSwipeRight: nextPanel });
+  useKeyDown({ ArrowLeft: prevPanel, ArrowRight: nextPanel });
 
-  useKeyDown({
-    ArrowLeft: prevPanel,
-    ArrowRight: nextPanel,
-  });
+  // TEST PURPOSES for Seats component
+  const [players, setPlayers] = useState<string[]>(["Paweł", "Maciek", "Kuba", "Asia", "Ola"]);
 
-  const [players, setPlayers] = useState<string[]>(["Paweł", "Maciek"]);
-
-  // TEST PURPOSES
   const handleSetPosition = (i: number) => {
-    console.log(i);
-
     const val = namesGen.next().value;
     if (!val) return;
-
     setPlayers((players) => {
       const newPlayers = [...players];
       newPlayers.splice(i, 0, val);
@@ -78,14 +77,14 @@ function Lobby() {
         </Button>
       </Modal>
 
-      <div className="flex h-full max-w-md flex-col border-2">
+      <div className="flex h-full max-w-md select-none flex-col border-2">
         <div className="flex justify-between p-4">
           <h1>MafiAKAI</h1>
           <div className="">Options</div>
         </div>
 
         <div className="flex border-b-2 border-neutral-800">
-          {Object.values(Panels).map((panelName, i) => (
+          {panelsValues.map((panelName, i) => (
             <button
               className={`w-full rounded-t-2xl py-1 transition-colors ${i === panelId ? "bg-neutral-800 text-white" : ""}`}
               onClick={() => setPanel(i)}
@@ -97,12 +96,12 @@ function Lobby() {
         </div>
 
         <div className="h-full" ref={swipeRef}>
-          {panelsValues[panelId] === Panels.Seat ? (
+          {panelsValues[panelId] === Panels.Seat && (
             <Seat players={players} selectSeat={handleSetPosition} yourSeat={null} />
-          ) : (
-            <></>
           )}
           {panelsValues[panelId] === Panels.Character ? <Character /> : <></>}
+          {panelsValues[panelId] === Panels.Waiting ? <Waiting playername={players} /> : <></>}
+          {panelsValues[panelId] === Panels.Character && <Character />}
         </div>
       </div>
     </>

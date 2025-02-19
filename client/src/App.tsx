@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router";
 
-import ConnectionProvider from "./ConnectionProvider";
+import { ConnectionProvider } from "@/features/connection";
 import { GameScreen, MenuScreen } from "@/pages";
 
 function App() {

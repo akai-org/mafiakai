@@ -1,8 +1,8 @@
 import { Room } from "./Room";
+import crypto from "node:crypto";
 
-class RoomManager {
+export class RoomManager {
   rooms = new Map<string, Room>([["000000", new Room("000000")]]);
-  private playerIdCounter = 1;
 
   // unique 5 digits room code
   generateCode(): string {
@@ -13,8 +13,8 @@ class RoomManager {
     return code;
   }
 
-  generatePlayerId(): number {
-    return this.playerIdCounter++;
+  generatePlayerId(): string {
+    return crypto.randomUUID();
   }
 
   create(): string {
@@ -28,5 +28,3 @@ class RoomManager {
     return this.rooms.get(code);
   }
 }
-
-export const manager = new RoomManager();

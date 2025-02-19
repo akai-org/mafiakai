@@ -4,6 +4,8 @@ import Character from "./Character";
 import Seat from "./Seats";
 import Waiting from "./Waiting";
 import useKeyDown from "@/hooks/useKeyDown";
+import { Button, Input, Modal } from "@/components";
+import { socket } from "@/constants";
 
 enum Panels {
   Character = "Character",
@@ -53,35 +55,56 @@ function Lobby() {
     });
   };
 
+  const [playerName, setPlayerName] = useState<string>("");
+  const [isModalOpened, setIsModalOpened] = useState(true);
+  const playerNameLength = playerName?.trim().length;
+
+  const handleNameConfirmation = () => {
+    if (playerNameLength > 1) {
+      socket.emit("send_player_name", playerName);
+      setIsModalOpened(false);
+    }
+  };
+
   return (
-    <div className="flex h-full max-w-md select-none flex-col border-2">
-      <div className="flex justify-between p-4">
-        <h1>MafiAKAI</h1>
+    <>
+      <Modal canBeDismissed={false} showCloseIcon={false} isOpened={isModalOpened}>
+        <h2 className="mt-3 text-2xl font-bold">Enter your name</h2>
+        <p className="text-center">This will help other players bind your name with your character.</p>
+        <Input type="text" value={playerName} onChange={(e) => setPlayerName(e.target.value)} className="my-2" />
+        <Button disabled={!(playerNameLength > 1)} onClick={handleNameConfirmation}>
+          Confirm
+        </Button>
+      </Modal>
 
-        <div className="">Options</div>
-      </div>
+      <div className="flex h-full max-w-md select-none flex-col border-2">
+        <div className="flex justify-between p-4">
+          <h1>MafiAKAI</h1>
+          <div className="">Options</div>
+        </div>
 
-      <div className="flex border-b-2 border-neutral-800">
-        {panelsValues.map((panelName, i) => (
-          <button
-            className={`w-full rounded-t-2xl py-1 transition-colors ${i === panelId ? "bg-neutral-800 text-white" : ""}`}
-            onClick={() => setPanel(i)}
-            key={panelName}
-          >
-            {panelName}
-          </button>
-        ))}
-      </div>
+        <div className="flex border-b-2 border-neutral-800">
+          {panelsValues.map((panelName, i) => (
+            <button
+              className={`w-full rounded-t-2xl py-1 transition-colors ${i === panelId ? "bg-neutral-800 text-white" : ""}`}
+              onClick={() => setPanel(i)}
+              key={panelName}
+            >
+              {panelName}
+            </button>
+          ))}
+        </div>
 
-      <div className="h-full" ref={swipeRef}>
-        {panelsValues[panelId] === Panels.Seat && (
-          <Seat players={players} selectSeat={handleSetPosition} yourSeat={null} />
-        )}
-        {panelsValues[panelId] === Panels.Character ? <Character /> : <></>}
-        {panelsValues[panelId] === Panels.Waiting ? <Waiting playername={players} /> : <></>}
-        {panelsValues[panelId] === Panels.Character && <Character />}
+        <div className="h-full" ref={swipeRef}>
+          {panelsValues[panelId] === Panels.Seat && (
+            <Seat players={players} selectSeat={handleSetPosition} yourSeat={null} />
+          )}
+          {panelsValues[panelId] === Panels.Character ? <Character /> : <></>}
+          {panelsValues[panelId] === Panels.Waiting ? <Waiting playername={players} /> : <></>}
+          {panelsValues[panelId] === Panels.Character && <Character />}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

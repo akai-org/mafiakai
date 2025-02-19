@@ -5,9 +5,10 @@
   "scripts": {
     "client:dev": "npm --prefix ./client run dev",
     "server:dev": "npm --prefix ./server run dev",
-    "all:dev": "npx concurrently \"npm run client:dev\" \"npm run server:dev\"",
+    "all:dev": "concurrently \"npm run client:dev\" \"npm run server:dev\"",
     "format:front": "prettier --write \"./client/src/**/*.{js,jsx,ts,tsx}\"",
-    "format:back": "prettier --write \"./server/src/**/*.{js,jsx,ts,tsx}\""
+    "format:back": "prettier --write \"./server/src/**/*.{js,jsx,ts,tsx}\"",
+    "instDeps": "concurrently \"npm i\" \"cd server && npm i\" \"cd client && npm i\""
   },
   "repository": {
     "type": "git",

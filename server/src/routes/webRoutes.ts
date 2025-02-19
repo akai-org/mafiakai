@@ -1,5 +1,5 @@
 import express from "express";
-import { manager } from "./RoomManager";
+import { manager } from "@/constants";
 
 const webRouter = express.Router();
 
@@ -20,7 +20,7 @@ webRouter.get("/room/:code", (req, res) => {
     return;
   }
 
-  res.json({ roomCode: room.code, playersInRoom: room.players.length });
+  res.json({ roomCode: room.code, playersInRoom: room.getPlayers().length });
 });
 
 export default webRouter;

@@ -2,12 +2,10 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 
-import { MAServer } from "@local/Sockets";
-import config from "./config";
-
-import socketAuth from "@/socketAuth";
-import socketRoutes from "@/socketRoutes";
-import webRoutes from "@/webRoutes";
+import { MAServer } from "@/types";
+import { config } from "@/constants";
+import { socketAuth } from "@/middlewares";
+import { socketRoutes, webRouter } from "@/routes";
 
 const app = express(); // Create an Express application
 
@@ -24,10 +22,10 @@ const socketsServer: MAServer = new Server(httpServer, {
 
 // Configure servers
 socketsServer.use(socketAuth).on("connection", socketRoutes); // Configure the WebSocket server
-app.use("/", webRoutes); // Configure the HTTP server
+app.use("/", webRouter); // Configure the HTTP server
 
 // Start servers
-httpServer.listen(config.PORT); // See https://socket.io/docs/v4/server-initialization/#with-express
-console.log(
-  `Server is running on${"\x1b[34m"} http://${config.HOST}:${config.PORT}${"\x1b[0m"}`
-);
+httpServer.listen(config.PORT, () => {
+  console.log(`Server is running on${"\x1b[34m"} http://${config.HOST}:${config.PORT}${"\x1b[0m"}`);
+});
+// See https://socket.io/docs/v4/server-initialization/#with-express

@@ -12,7 +12,7 @@ import { Phases } from "@global/Game";
 export default function socketAuth(socket: MASocket, next: (err?: ExtendedError) => void) {
   // Code
   const code = socket.handshake.query.roomCode;
-  if (code === undefined) return next(new Error("Invalud code provided"));
+  if (code === undefined) return next(new Error("Invalid code provided"));
   if (typeof code !== "string") return next(new Error("Invalid code provided"));
 
   // Room

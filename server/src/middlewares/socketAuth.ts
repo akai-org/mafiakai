@@ -1,7 +1,7 @@
 import { ExtendedError } from "socket.io";
 import { MASocket } from "@/types";
 import { manager } from "@/constants";
-import { NON_STRICT_PHASES } from "@global/Game";
+import { Phases } from "@global/Game";
 
 /*
  Validate connection and Join player to room
@@ -24,17 +24,17 @@ export default function socketAuth(socket: MASocket, next: (err?: ExtendedError)
   // Join as old player
   if (room.hasPlayer(playerId)) {
     socket.data = { playerId, roomCode: code };
-    socket.join(room.code);
+    socket.join(room.code); // Assign player to socket room
     return next();
   }
 
   // Join as new player
-  if (NON_STRICT_PHASES.includes(room.phase)) {
+  if (room.phase === Phases.LOBBY) {
     const newPlayerId = manager.generatePlayerId();
     room.addPlayer(newPlayerId);
 
     socket.data = { playerId: newPlayerId, roomCode: code };
-    socket.join(room.code);
+    socket.join(room.code); // Assign player to socket room
     return next();
   }
 

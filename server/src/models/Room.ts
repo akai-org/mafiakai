@@ -1,4 +1,4 @@
-import { NON_STRICT_PHASES, Phases } from "@global/Game";
+import { Phases } from "@global/Game";
 import { Player } from "./Player";
 
 export class Room {
@@ -15,7 +15,7 @@ export class Room {
   }
 
   disconnectPlayer(playerId: string) {
-    if (NON_STRICT_PHASES.includes(this.phase)) {
+    if (this.phase === Phases.LOBBY) {
       this.players.delete(playerId);
     } else {
       this.players.get(playerId)!.online = false;

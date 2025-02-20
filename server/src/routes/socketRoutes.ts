@@ -19,7 +19,6 @@ export default function socketRoutes(socket: MASocket) {
   //TODO: Should player be assigned to socket room too?
   const room = manager.getRoom(socket.data.roomCode)!;
   const playerId = socket.data.playerId;
-  console.log("New player connected!");
 
   socket.emit("conn_info_data", {
     playerId: socket.data.playerId,
@@ -33,10 +32,9 @@ export default function socketRoutes(socket: MASocket) {
 
   if (check_is_room_ready(room)){
     const seconds10 = 10_000;
-    socket.to(room.code).emit("planned_phase_change", Phases.POSITION_SELECTION, Date.now()+seconds10)
+    socket.to(room.code).emit("planned_phase_change", Phases.ROLE_ASSIGNMENT, Date.now()+seconds10)
     setTimeout(()=>{
-      console.log("4 players ready, let's go");
-      room.phase = Phases.POSITION_SELECTION;
+      room.phase = Phases.ROLE_ASSIGNMENT;
       socket.to(room.code).emit("phase_updated",room.phase);
     }, seconds10);
   }

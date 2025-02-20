@@ -1,5 +1,6 @@
-import { NON_STRICT_PHASES, Phases } from "@global/Game";
+import { Phases } from "@global/Game";
 import { Player } from "./Player";
+import { Roles } from "@global/Roles";
 
 export class Room {
   code: string;
@@ -15,7 +16,7 @@ export class Room {
   }
 
   disconnectPlayer(playerId: string) {
-    if (NON_STRICT_PHASES.includes(this.phase)) {
+    if (this.phase === Phases.LOBBY) {
       this.players.delete(playerId);
     } else {
       this.players.get(playerId)!.online = false;
@@ -40,6 +41,10 @@ export class Room {
     }
 
     this.players.get(playerId)!.seat = seat;
+  }
+
+  setPlayerRole(playerId: string, role: Roles) {
+    this.players.get(playerId)!.role = role;
   }
 
   getPlayersBySeat() {

@@ -7,6 +7,7 @@ export class Player {
   role: Roles | null = null;
   seat: number | null = null;
   name: string | null = null; // Real name of the player
+  isReady: boolean = false;
 
   constructor(
     public id: string // Unique identifier for the player

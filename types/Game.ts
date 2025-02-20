@@ -1,20 +1,14 @@
 export enum Phases {
   /**
-   * Faza LOBBY: Gracze dołączają do gry. Gra czeka, aż wszyscy gracze zgłoszą gotowość.
+   * Faza LOBBY: 
+   * - Gracze dołączają do gry. 
+   * - Gracze wybierają swoje pozycje (np. miejsca przy stole).
+   * - Gracze wybierają swoje jawne postacie.
+   * 
+   * Jedyna faza gry, w której mogą dołączyć nowi gracze.
+   * Gra czeka, aż wszyscy gracze zgłoszą gotowość, po czym przechodzi do ROLE_ASSIGNMENT.
    */
   LOBBY = "LOBBY",
-
-  /**
-   * Faza POSITION_SELECTION: Gracze wybierają swoje pozycje (np. miejsca przy stole).
-   * Jeśli wszyscy gracze są gotowi, gra przechodzi do CHARACTER_SELECTION.
-   */
-  POSITION_SELECTION = "POSITION_SELECTION",
-
-  /**
-   * Faza CHARACTER_SELECTION: Gracze wybierają swoje jawne postacie.
-   * Jeśli wszyscy gracze są gotowi, gra przechodzi do ROLE_ASSIGNMENT.
-   */
-  CHARACTER_SELECTION = "CHARACTER_SELECTION",
 
   /**
    * Faza ROLE_ASSIGNMENT: Gracze otrzymują swoje tajne role (np. obywatel, mafia).
@@ -24,14 +18,10 @@ export enum Phases {
 
   /**
    * Faza WELCOME: Krótkie wprowadzenie do gry. Gracze mogą zapoznać się z zasadami.
-   * Po określonym czasie gra automatycznie przechodzi do ROUND_START.
+   * Oficjalne rozpoczęcie rundy. Trwa przez krótki czas, zanim gra przejdzie do DAY.
+   * Po określonym czasie gra automatycznie przechodzi do DAY.
    */
   WELCOME = "WELCOME",
-
-  /**
-   * Faza ROUND_START: Oficjalne rozpoczęcie rundy. Trwa przez krótki czas, zanim gra przejdzie do DAY.
-   */
-  ROUND_START = "ROUND_START",
 
   /**
    * Faza DAY: Początek dnia w grze. Gracze mogą rozmawiać i analizować wydarzenia.
@@ -94,12 +84,3 @@ export enum Phases {
    */
   GAME_END = "GAME_END",
 }
-
-/**
- * Fazy gry, do których mogą dołączyć nowi gracze.
- */
-export const NON_STRICT_PHASES: ReadonlyArray<Phases> = [
-  Phases.LOBBY,
-  Phases.POSITION_SELECTION,
-  Phases.CHARACTER_SELECTION,
-];

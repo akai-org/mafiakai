@@ -2,9 +2,16 @@ import { MASocket } from "@/types";
 import { manager } from "@/constants";
 import { Player, Room } from "@/models";
 import { Phases } from "@global/Game";
+import { Roles } from "@global/Roles";
+
+function null_or_undefined(x: any | null | undefined) {
+  return x === null || x === undefined;
+}
 
 function some_player_is_not_ready(players: Player[]): boolean {
-  return players.some((x: Player)=>{return !x.isReady;});
+  return players.some((x: Player) => {
+    return !x.isReady || null_or_undefined(x.name) || null_or_undefined(x.seat);
+  });
 }
 
 const MINIMUM_NUMBER_OF_READY_PLAYERS_TO_START: number = 4;

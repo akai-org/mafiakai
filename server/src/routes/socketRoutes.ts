@@ -81,13 +81,22 @@ export default function socketRoutes(socket: MASocket) {
     room?.disconnectPlayer(playerId);
   });
 
-  if (check_is_room_ready(room)){
-    const seconds10 = 10_000;
-    socket.to(room.code).emit("planned_phase_change", Phases.ROLE_ASSIGNMENT, Date.now()+seconds10)
-    setTimeout(()=>{
+  if (check_is_room_ready(room)) {
+    const one_second = 1_000;
+    socket.to(room.code).emit("planned_phase_change", Phases.ROLE_ASSIGNMENT, Date.now() + one_second);
+    setTimeout(() => {
       room.phase = Phases.ROLE_ASSIGNMENT;
-      socket.to(room.code).emit("phase_updated",room.phase);
-    }, seconds10);
+      socket.to(room.code).emit("phase_updated", room.phase);
+      if (!establish_roles(room)){
+        console.log("Inconsistent limits for the minimum number of players");
+        return;
+      } 
+      for (const p of room.getPlayers()){
+        // Generate rooms for each [(specific role) intersection (game room)]
+        // Add players to these rooms
+        socket.to(p.id).emit("set_player_role",p.role!);
+      }
+    }, one_second);
   }
 
   socket.on("send_player_name", (playerName) => {

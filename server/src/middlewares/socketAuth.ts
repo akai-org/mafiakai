@@ -24,6 +24,7 @@ export default function socketAuth(socket: MASocket, next: (err?: ExtendedError)
   // Join as old player
   if (room.hasPlayer(playerId)) {
     socket.data = { playerId, roomCode: code };
+    socket.join(playerId); // Assign player to their own private room
     socket.join(room.code); // Assign player to socket room
     return next();
   }
@@ -34,6 +35,7 @@ export default function socketAuth(socket: MASocket, next: (err?: ExtendedError)
     room.addPlayer(newPlayerId);
 
     socket.data = { playerId: newPlayerId, roomCode: code };
+    socket.join(playerId); // Assign player to their own private room
     socket.join(room.code); // Assign player to socket room
     return next();
   }

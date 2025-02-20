@@ -1,4 +1,5 @@
 import type { Phases } from "./Game";
+import { Roles } from "./Roles";
 
 type timestamp = number;
 
@@ -7,6 +8,7 @@ export interface Server2ClientEvents {
   conn_info_data: (data: ConnectionInfoData) => void;
   phase_updated: (phase: Phases) => void;
   planned_phase_change: (phase: Phases, when: timestamp) => void; // Notifies about upcoming changes to phases with a numeric unix timestamp in milliseconds (Date.now())
+  set_player_role: (role: Roles) => void;
 }
 
 export type ConnectionInfoData = { playerId: string };

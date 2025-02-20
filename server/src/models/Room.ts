@@ -1,5 +1,6 @@
 import { Phases } from "@global/Game";
 import { Player } from "./Player";
+import { Roles } from "@global/Roles";
 
 export class Room {
   code: string;
@@ -40,6 +41,10 @@ export class Room {
     }
 
     this.players.get(playerId)!.seat = seat;
+  }
+
+  setPlayerRole(playerId: string, role: Roles) {
+    this.players.get(playerId)!.role = role;
   }
 
   getPlayersBySeat() {

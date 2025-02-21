@@ -37,16 +37,10 @@ export enum Phases {
 
   /**
    * Faza VOTING: Gracze głosują na osobę, która ich zdaniem powinna zostać wyeliminowana.
-   * Jeśli dwie lub więcej osób otrzyma taką samą największą liczbę głosów, gra przechodzi do VOTING_OVERTIME.
+   * Jeśli dwie lub więcej osób otrzyma taką samą największą liczbę głosów, głosowanie rozpoczyna się ponownie.
    * W przeciwnym razie, gra przechodzi do NIGHT.
    */
   VOTING = "VOTING",
-
-  /**
-   * Faza VOTING_OVERTIME: Dogrywka głosowania, gdy dwie lub więcej osób otrzymało największą liczbę głosów.
-   * Po rozstrzygnięciu gra przechodzi do NIGHT.
-   */
-  VOTING_OVERTIME = "VOTING_OVERTIME",
 
   /**
    * Faza NIGHT: Gracze wykonują swoje nocne akcje.

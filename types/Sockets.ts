@@ -18,6 +18,7 @@ export interface Client2ServerEvents {
   set_position: (position: number, callback: ResponseHandler) => void;
   vote: (data: string) => void;
   send_player_name: (playerName: string) => void;
+  set_ready: () => void;
 }
 
 export interface InterServerEvents {

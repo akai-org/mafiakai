@@ -1,3 +1,4 @@
+// prettier-ignore
 import {
   Client2ServerEvents,
   InterServerEvents,
@@ -6,6 +7,7 @@ import {
 } from "@global/Sockets";
 import { Server, Socket } from "socket.io";
 
+// prettier-ignore
 export type MAServer = Server<
   Client2ServerEvents,
   Server2ClientEvents,
@@ -13,6 +15,7 @@ export type MAServer = Server<
   SocketData
 >;
 
+// prettier-ignore
 export type MASocket = Socket<
   Client2ServerEvents,
   Server2ClientEvents,

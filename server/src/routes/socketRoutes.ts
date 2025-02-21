@@ -17,7 +17,6 @@ export default function socketRoutes(socket: MASocket) {
     room?.disconnectPlayer(playerId);
   });
 
-
   socket.on("set_ready", () => {
     room.getPlayer(playerId)!.isReady = true;
   });

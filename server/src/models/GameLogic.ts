@@ -81,45 +81,90 @@ export class PhaseRouter {
 
   private phases: PhasesTransitionsConditions = {
     [Phases.LOBBY]: (game) => {
-      if (game.room.getPlayers().every((player) => player.isReady)) return Phases.WELCOME;
-      if (!game.timer.isRunning) return Phases.WELCOME;
+      if (game.room.check_is_room_ready()) return Phases.ROLE_ASSIGNMENT;
+      //   if (!game.timer.isRunning) return Phases.ROLE_ASSIGNMENT;
       return null;
     },
     [Phases.ROLE_ASSIGNMENT]: function (game: Game): Phases | null {
-      throw new Error("Function not implemented.");
+      if (
+        !game.room.getPlayers().some((player: Player) => {
+          null_or_undefined(player.role);
+        }) &&
+        !game.timer.isRunning
+      ) {
+        return Phases.WELCOME;
+      }
+      return null;
     },
     [Phases.WELCOME]: function (game: Game): Phases | null {
-      throw new Error("Function not implemented.");
+      if (!game.timer.isRunning) return Phases.DAY;
+      return null;
     },
     [Phases.DAY]: function (game: Game): Phases | null {
-      throw new Error("Function not implemented.");
+      if (!game.timer.isRunning) return Phases.DEBATE;
+      return null;
     },
     [Phases.DEBATE]: function (game: Game): Phases | null {
-      throw new Error("Function not implemented.");
+      if (!game.timer.isRunning) return Phases.VOTING;
+      return null;
     },
     [Phases.VOTING]: function (game: Game): Phases | null {
-      throw new Error("Function not implemented.");
-    },
-    [Phases.VOTING_OVERTIME]: function (game: Game): Phases | null {
-      throw new Error("Function not implemented.");
+      if (sum(game.common_vote) === game.room.getPlayers().length) {
+        const winners = Game.find_winners(game.common_vote);
+        if (winners.length == 1) {
+          return Phases.NIGHT;
+        }
+      }
+      return null;
     },
     [Phases.NIGHT]: function (game: Game): Phases | null {
-      throw new Error("Function not implemented.");
+      if (!game.timer.isRunning) return Phases.BODYGUARD_DEFENSE;
+      return null;
     },
     [Phases.BODYGUARD_DEFENSE]: function (game: Game): Phases | null {
-      throw new Error("Function not implemented.");
+      if (!null_or_undefined(game.chosen_by_bodyguard)) {
+        return Phases.DETECTIVE_CHECK;
+      }
+      if (!game.timer.isRunning) return Phases.DETECTIVE_CHECK;
+      return null;
     },
     [Phases.DETECTIVE_CHECK]: function (game: Game): Phases | null {
-      throw new Error("Function not implemented.");
+      if (!null_or_undefined(game.chosen_by_detective)) {
+        return Phases.MAFIA_VOTING;
+      }
+      if (!game.timer.isRunning) return Phases.MAFIA_VOTING;
+      return null;
     },
     [Phases.MAFIA_VOTING]: function (game: Game): Phases | null {
-      throw new Error("Function not implemented.");
+      if (
+        sum(game.mafia_vote) ===
+        game.room.getPlayers().filter((p: Player) => {
+          return p.role === Roles.MAFIOSO;
+        }).length
+      ) {
+        const winners = Game.find_winners(game.mafia_vote);
+        if (winners.length == 1) {
+          return Phases.ROUND_END;
+        }
+      }
+      if (!game.timer.isRunning) return Phases.ROUND_END;
+      return null;
     },
     [Phases.ROUND_END]: function (game: Game): Phases | null {
-      throw new Error("Function not implemented.");
+      const mafia_len = game.room.getPlayers().filter((p: Player) => {
+        return p.role === Roles.MAFIOSO;
+      }).length;
+      const non_mafia_len = game.room.getPlayers().filter((p: Player) => {
+        return !(p.role === Roles.MAFIOSO);
+      }).length;
+      if (mafia_len >= non_mafia_len || mafia_len == 0) {
+        return Phases.GAME_END;
+      }
+      return null;
     },
     [Phases.GAME_END]: function (game: Game): Phases | null {
-      throw new Error("Function not implemented.");
+      if (!game.timer.isRunning) return Phases.LOBBY;
+      return null;
     },
   };
 

@@ -40,18 +40,18 @@ function null_or_undefined(x: any | null | undefined) {
 //   }, one_second);
 // }
 
-export type TransitionCondition = (game: Game) => Phases | null;
+export type TransitionCondition = (game: Game, socket: MASocket) => Phases | null;
 export type PhasesTransitionsConditions = Record<Phases, TransitionCondition>;
 
 export class PhaseRouter {
   constructor(public current: Phases) {}
 
   private phases: PhasesTransitionsConditions = {
-    [Phases.LOBBY]: (game: Game) => {
+    [Phases.LOBBY]: function (game: Game, socket: MASocket): Phases | null {
       if (game.room.check_is_room_ready()) return Phases.ROLE_ASSIGNMENT;
       return null;
     },
-    [Phases.ROLE_ASSIGNMENT]: function (game: Game): Phases | null {
+    [Phases.ROLE_ASSIGNMENT]: function (game: Game, socket: MASocket): Phases | null {
       if (
         !game.room.getPlayers().some((player: Player) => {
           null_or_undefined(player.role);
@@ -62,19 +62,19 @@ export class PhaseRouter {
       }
       return null;
     },
-    [Phases.WELCOME]: function (game: Game): Phases | null {
+    [Phases.WELCOME]: function (game: Game, socket: MASocket): Phases | null {
       if (!game.timer.isRunning) return Phases.DAY;
       return null;
     },
-    [Phases.DAY]: function (game: Game): Phases | null {
+    [Phases.DAY]: function (game: Game, socket: MASocket): Phases | null {
       if (!game.timer.isRunning) return Phases.DEBATE;
       return null;
     },
-    [Phases.DEBATE]: function (game: Game): Phases | null {
+    [Phases.DEBATE]: function (game: Game, socket: MASocket): Phases | null {
       if (!game.timer.isRunning) return Phases.VOTING;
       return null;
     },
-    [Phases.VOTING]: function (game: Game): Phases | null {
+    [Phases.VOTING]: function (game: Game, socket: MASocket): Phases | null {
       if (sum(game.common_vote) === game.room.getPlayers().length) {
         const winners = Game.find_winners(game.common_vote);
         if (winners.length == 1) {
@@ -83,25 +83,25 @@ export class PhaseRouter {
       }
       return null;
     },
-    [Phases.NIGHT]: function (game: Game): Phases | null {
+    [Phases.NIGHT]: function (game: Game, socket: MASocket): Phases | null {
       if (!game.timer.isRunning) return Phases.BODYGUARD_DEFENSE;
       return null;
     },
-    [Phases.BODYGUARD_DEFENSE]: function (game: Game): Phases | null {
+    [Phases.BODYGUARD_DEFENSE]: function (game: Game, socket: MASocket): Phases | null {
       if (!null_or_undefined(game.chosen_by_bodyguard)) {
         return Phases.DETECTIVE_CHECK;
       }
       if (!game.timer.isRunning) return Phases.DETECTIVE_CHECK;
       return null;
     },
-    [Phases.DETECTIVE_CHECK]: function (game: Game): Phases | null {
+    [Phases.DETECTIVE_CHECK]: function (game: Game, socket: MASocket): Phases | null {
       if (!null_or_undefined(game.chosen_by_detective)) {
         return Phases.MAFIA_VOTING;
       }
       if (!game.timer.isRunning) return Phases.MAFIA_VOTING;
       return null;
     },
-    [Phases.MAFIA_VOTING]: function (game: Game): Phases | null {
+    [Phases.MAFIA_VOTING]: function (game: Game, socket: MASocket): Phases | null {
       if (
         sum(game.mafia_vote) ===
         game.room.getPlayers().filter((p: Player) => {
@@ -116,7 +116,7 @@ export class PhaseRouter {
       if (!game.timer.isRunning) return Phases.ROUND_END;
       return null;
     },
-    [Phases.ROUND_END]: function (game: Game): Phases | null {
+    [Phases.ROUND_END]: function (game: Game, socket: MASocket): Phases | null {
       const mafia_len = game.room.getPlayers().filter((p: Player) => {
         return p.role === Roles.MAFIOSO;
       }).length;
@@ -128,14 +128,14 @@ export class PhaseRouter {
       }
       return null;
     },
-    [Phases.GAME_END]: function (game: Game): Phases | null {
+    [Phases.GAME_END]: function (game: Game, socket: MASocket): Phases | null {
       if (!game.timer.isRunning) return Phases.LOBBY;
       return null;
     },
   };
 
-  update(game: Game) {
-    const transition = this.phases[this.current](game);
+  update(game: Game, socket: MASocket) {
+    const transition = this.phases[this.current](game, socket);
     if (transition) this.current = transition;
   }
 }

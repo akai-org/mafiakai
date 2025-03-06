@@ -1,6 +1,7 @@
 import { Phases } from "@global/Game";
-import { Player, Room } from "./";
+import { Game, Player } from ".";
 import { Roles } from "@global/Roles";
+import { MASocket } from "@/types";
 
 function sum(map: Map<any, number>): number {
   var res = 0;
@@ -14,64 +15,30 @@ function null_or_undefined(x: any | null | undefined) {
   return x === null || x === undefined;
 }
 
-export class Timer {
-  public isRunning = false;
-  private timeout_id: NodeJS.Timeout | null = null;
-  private callback: (() => void) | null = null;
-  private until: number | null = null;
-  constructor(private time: number) {}
-
-  getUntil() {
-    return this.until;
-  }
-
-  extend(milliseconds: number) {
-    if (this.isRunning === false || null_or_undefined(this.timeout_id) || null_or_undefined(this.callback)) {
-      throw new Error("Nothing is scheduled.");
-    }
-    clearTimeout(this.timeout_id!);
-    this.isRunning = true;
-    this.until = Date.now() + milliseconds;
-    setTimeout(() => {
-      this.isRunning = false;
-      this.callback!();
-    }, milliseconds);
-  }
-
-  start(callback: () => void) {
-    this.isRunning = true;
-    this.until = Date.now() + this.time;
-    this.callback = callback;
-    this.timeout_id = setTimeout(() => {
-      this.isRunning = false;
-      callback();
-    }, this.time);
-  }
-}
-
-export class Game {
-  phase = new PhaseRouter(Phases.LOBBY);
-  timer = new Timer(5000); // 5 seconds
-  common_vote = new Map<string, number>();
-  mafia_vote = new Map<string, number>();
-  chosen_by_detective: string = "";
-  chosen_by_bodyguard: string = "";
-  constructor(public room: Room) {}
-
-  static find_winners(map: Map<string, number>) {
-    var max: number = 0;
-    var chosen: Array<string> = [];
-    for (const p of map) {
-      if (p[1] > max) {
-        max = p[1];
-        chosen = [p[0]];
-      } else if (p[1] === max) {
-        chosen.push(p[0]);
-      }
-    }
-    return chosen;
-  }
-}
+   // if (check_is_room_ready(room)) {
+  //   const one_second = 1_000;
+  //   socket.to(room.code).emit("planned_phase_change", Phases.ROLE_ASSIGNMENT, Date.now() + one_second);
+  //   setTimeout(() => {
+  //     room.phase = Phases.ROLE_ASSIGNMENT;
+  //     socket.to(room.code).emit("phase_updated", room.phase);
+  //     if (!establish_roles(room)) {
+  //       console.log("Inconsistent limits for the minimum number of players");
+  //       return;
+  //     }
+  //     for (const p of room.getPlayers()) {
+  //       // TODO: Generate rooms for each [(specific role) intersection (game room)]
+  //       // TODO: Add players to these rooms
+  //       socket.to(p.id).emit("set_player_role", p.role!);
+  //     }
+  //     room.phase = Phases.WELCOME;
+  //     socket.to(room.code).emit("phase_updated", room.phase);
+  //     socket.to(room.code).emit("planned_phase_change", Phases.DAY, Date.now() + 5 * one_second);
+  //     setTimeout(() => {
+  //       room.phase = Phases.DAY;
+  //       socket.to(room.code).emit("phase_updated", room.phase);
+  //     }, 5 * one_second);
+  //   }, one_second);
+  // }
 
 export type TransitionCondition = (game: Game) => Phases | null;
 export type PhasesTransitionsConditions = Record<Phases, TransitionCondition>;

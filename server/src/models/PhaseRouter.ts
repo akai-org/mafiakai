@@ -15,30 +15,30 @@ function null_or_undefined(x: any | null | undefined) {
   return x === null || x === undefined;
 }
 
-   // if (check_is_room_ready(room)) {
-  //   const one_second = 1_000;
-  //   socket.to(room.code).emit("planned_phase_change", Phases.ROLE_ASSIGNMENT, Date.now() + one_second);
-  //   setTimeout(() => {
-  //     room.phase = Phases.ROLE_ASSIGNMENT;
-  //     socket.to(room.code).emit("phase_updated", room.phase);
-  //     if (!establish_roles(room)) {
-  //       console.log("Inconsistent limits for the minimum number of players");
-  //       return;
-  //     }
-  //     for (const p of room.getPlayers()) {
-  //       // TODO: Generate rooms for each [(specific role) intersection (game room)]
-  //       // TODO: Add players to these rooms
-  //       socket.to(p.id).emit("set_player_role", p.role!);
-  //     }
-  //     room.phase = Phases.WELCOME;
-  //     socket.to(room.code).emit("phase_updated", room.phase);
-  //     socket.to(room.code).emit("planned_phase_change", Phases.DAY, Date.now() + 5 * one_second);
-  //     setTimeout(() => {
-  //       room.phase = Phases.DAY;
-  //       socket.to(room.code).emit("phase_updated", room.phase);
-  //     }, 5 * one_second);
-  //   }, one_second);
-  // }
+// if (check_is_room_ready(room)) {
+//   const one_second = 1_000;
+//   socket.to(room.code).emit("planned_phase_change", Phases.ROLE_ASSIGNMENT, Date.now() + one_second);
+//   setTimeout(() => {
+//     room.phase = Phases.ROLE_ASSIGNMENT;
+//     socket.to(room.code).emit("phase_updated", room.phase);
+//     if (!establish_roles(room)) {
+//       console.log("Inconsistent limits for the minimum number of players");
+//       return;
+//     }
+//     for (const p of room.getPlayers()) {
+//       // TODO: Generate rooms for each [(specific role) intersection (game room)]
+//       // TODO: Add players to these rooms
+//       socket.to(p.id).emit("set_player_role", p.role!);
+//     }
+//     room.phase = Phases.WELCOME;
+//     socket.to(room.code).emit("phase_updated", room.phase);
+//     socket.to(room.code).emit("planned_phase_change", Phases.DAY, Date.now() + 5 * one_second);
+//     setTimeout(() => {
+//       room.phase = Phases.DAY;
+//       socket.to(room.code).emit("phase_updated", room.phase);
+//     }, 5 * one_second);
+//   }, one_second);
+// }
 
 export type TransitionCondition = (game: Game) => Phases | null;
 export type PhasesTransitionsConditions = Record<Phases, TransitionCondition>;
@@ -47,9 +47,8 @@ export class PhaseRouter {
   constructor(public current: Phases) {}
 
   private phases: PhasesTransitionsConditions = {
-    [Phases.LOBBY]: (game) => {
+    [Phases.LOBBY]: (game: Game) => {
       if (game.room.check_is_room_ready()) return Phases.ROLE_ASSIGNMENT;
-      //   if (!game.timer.isRunning) return Phases.ROLE_ASSIGNMENT;
       return null;
     },
     [Phases.ROLE_ASSIGNMENT]: function (game: Game): Phases | null {

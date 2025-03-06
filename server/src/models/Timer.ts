@@ -1,7 +1,7 @@
 function null_or_undefined(x: any | null | undefined) {
-    return x === null || x === undefined;
+  return x === null || x === undefined;
 }
-  
+
 export class Timer {
   public isRunning = false;
   private timeout_id: NodeJS.Timeout | null = null;

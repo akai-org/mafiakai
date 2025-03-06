@@ -20,23 +20,24 @@ const app = express(); // Create an Express application
 // Create servers
 const httpServer = http.createServer(app); // Create an HTTP server
 
-const development_socketio_proxies = process.env.NODE_ENV != "production" ? ["https://admin.socket.io", "https://firecamp.dev"] : []
+const development_socketio_proxies =
+  process.env.NODE_ENV != "production" ? ["https://admin.socket.io", "https://firecamp.dev"] : [];
 
 // Create a WebSocket server
 const socketsServer: MAServer = new Server(httpServer, {
   cors: {
-    origin: ["http://localhost:5173",...development_socketio_proxies],
+    origin: ["http://localhost:5173", ...development_socketio_proxies],
     // methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
-if (process.env.NODE_ENV != "production" ){
+if (process.env.NODE_ENV != "production") {
   instrument(socketsServer, {
     auth: false,
     mode: "development",
   });
-  }
+}
 
 // Configure servers
 socketsServer.use(socketAuth).on("connection", socketRoutes); // Configure the WebSocket server

@@ -2,10 +2,11 @@ import { Phases } from "@global/Game";
 import { Player } from "./Player";
 import { Roles } from "@global/Roles";
 import { config } from "@/constants";
+import { RoomModel } from "@global/RoomModel";
 
-export class Room {
+export class Room implements RoomModel {
   code: string;
-  private players = new Map<string, Player>();
+  players = new Map<string, Player>();
   phase: Phases = Phases.LOBBY;
 
   constructor(code: string) {

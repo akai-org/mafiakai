@@ -1,10 +1,10 @@
 export enum Phases {
   /**
-   * Faza LOBBY: 
-   * - Gracze dołączają do gry. 
+   * Faza LOBBY:
+   * - Gracze dołączają do gry.
    * - Gracze wybierają swoje pozycje (np. miejsca przy stole).
    * - Gracze wybierają swoje jawne postacie.
-   * 
+   *
    * Jedyna faza gry, w której mogą dołączyć nowi gracze.
    * Gra czeka, aż wszyscy gracze zgłoszą gotowość, po czym przechodzi do ROLE_ASSIGNMENT.
    */
@@ -24,13 +24,9 @@ export enum Phases {
   WELCOME = "WELCOME",
 
   /**
-   * Faza DAY: Początek dnia w grze. Gracze mogą rozmawiać i analizować wydarzenia.
-   * Po określonym czasie gra przechodzi do DEBATE.
-   */
-  DAY = "DAY",
-
-  /**
-   * Faza DEBATE: Gracze prowadzą debatę na temat swoich podejrzeń.
+   * Faza DEBATE:
+   * Początek dnia w grze. Gracze mogą rozmawiać i analizować wydarzenia.
+   * Gracze prowadzą debatę na temat swoich podejrzeń.
    * Po określonym czasie gra przechodzi do VOTING.
    */
   DEBATE = "DEBATE",
@@ -41,6 +37,12 @@ export enum Phases {
    * W przeciwnym razie, gra przechodzi do NIGHT.
    */
   VOTING = "VOTING",
+
+  /**
+   *  Faza ROLE_REVEAL: Odkrycie roli gracza, który wygrał głosowanie
+   *  Gra automatycznie przechodzi do NIGHT lub kończy się.
+   */
+  ROLE_REVEAL = "ROLE_REVEAL",
 
   /**
    * Faza NIGHT: Gracze wykonują swoje nocne akcje.

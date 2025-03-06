@@ -27,6 +27,7 @@ export class Timer {
   }
 
   start(callback: () => void) {
+    clearTimeout(this.timeout_id!);
     this.isRunning = true;
     this.until = Date.now() + this.time;
     this.callback = callback;

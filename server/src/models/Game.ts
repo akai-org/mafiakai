@@ -1,5 +1,10 @@
 import { Phases } from "@global/Game";
-import { PhaseRouter, Room, Timer } from ".";
+import { PhaseRouter, Player, Room, Timer } from ".";
+import { Roles } from "@global/Roles";
+
+function null_or_undefined(x: any | null | undefined) {
+  return x === null || x === undefined;
+}
 
 export class Game {
   phase = new PhaseRouter(Phases.LOBBY);
@@ -22,5 +27,23 @@ export class Game {
       }
     }
     return chosen;
+  }
+
+  check_game_end(): boolean {
+    const mafia_len = this.room.getPlayers().filter((p: Player) => {
+      return p.role === Roles.MAFIOSO;
+    }).length;
+    const non_mafia_len = this.room.getPlayers().filter((p: Player) => {
+      return !(p.role === Roles.MAFIOSO);
+    }).length;
+    return mafia_len >= non_mafia_len || mafia_len == 0;
+  }
+
+  bodyguard_appointed(): boolean {
+    return this.chosen_by_bodyguard.length > 1 && this.room.hasPlayer(this.chosen_by_bodyguard);
+  }
+
+  detective_appointed(): boolean {
+    return this.chosen_by_detective.length > 1 && this.room.hasPlayer(this.chosen_by_detective);
   }
 }

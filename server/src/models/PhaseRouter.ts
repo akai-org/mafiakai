@@ -41,201 +41,123 @@ function null_or_undefined(x: any | null | undefined) {
 //   }, one_second);
 // }
 
-export type TransitionCondition = (game: Game, socket: MASocket) => Phases | null;
-export type PhasesTransitionsConditions = Record<Phases, TransitionCondition>;
-
 export class PhaseRouter {
   constructor(public current: Phases) {}
 
-  private phases: PhasesTransitionsConditions = {
-    [Phases.LOBBY]: function (game: Game, socket: MASocket): Phases | null {
-      if (game.room.check_is_room_ready()) {
-        socket.to(game.room.code).emit("phase_updated", Phases.ROLE_ASSIGNMENT);
-        socket
-          .to(game.room.code)
-          .emit("planned_phase_change", Phases.WELCOME, Date.now() + config.ROLE_ASSIGNMENT_TIMEOUT_MS);
-        game.timer = new Timer(config.ROLE_ASSIGNMENT_TIMEOUT_MS);
-        // game.timer.start(this.update(game));
-        return Phases.ROLE_ASSIGNMENT;
-      }
-      return null;
-    },
-    [Phases.ROLE_ASSIGNMENT]: function (game: Game, socket: MASocket): Phases | null {
-      if (
-        !game.room.getPlayers().some((player: Player) => {
-          null_or_undefined(player.role);
-        }) &&
-        !game.timer.isRunning
-      ) {
-        socket.to(game.room.code).emit("phase_updated", Phases.WELCOME);
-        socket.to(game.room.code).emit("planned_phase_change", Phases.DEBATE, Date.now() + config.WELCOME_TIMEOUT_MS);
-        game.timer = new Timer(config.WELCOME_TIMEOUT_MS);
-        // game.timer.start(this.update(game));
-        return Phases.WELCOME;
-      }
-      return null;
-    },
-    [Phases.WELCOME]: function (game: Game, socket: MASocket): Phases | null {
-      if (!game.timer.isRunning) {
-        socket.to(game.room.code).emit("phase_updated", Phases.DEBATE);
-        socket.to(game.room.code).emit("planned_phase_change", Phases.VOTING, Date.now() + config.DEBATE_TIMEOUT_MS);
-        game.timer = new Timer(config.DEBATE_TIMEOUT_MS);
-        // game.timer.start(this.update(game));
-        return Phases.DEBATE;
-      }
-      return null;
-    },
-    [Phases.DEBATE]: function (game: Game, socket: MASocket): Phases | null {
-      if (game.room.check_is_room_ready() || !game.timer.isRunning) {
-        socket.to(game.room.code).emit("phase_updated", Phases.VOTING);
-        socket
-          .to(game.room.code)
-          .emit("planned_phase_change", Phases.ROLE_REVEAL, Date.now() + config.VOTING_TIMEOUT_MS);
-        game.timer = new Timer(config.VOTING_TIMEOUT_MS);
-        // game.timer.start(this.update(game));
-        return Phases.VOTING;
-      }
-      return null;
-    },
-    [Phases.VOTING]: function (game: Game, socket: MASocket): Phases | null {
-      if (!game.timer.isRunning || sum(game.common_vote) === game.room.getPlayers().length) {
-        const winners = Game.find_winners(game.common_vote);
-        if (winners.length == 1) {
-          socket.to(game.room.code).emit("phase_updated", Phases.ROLE_REVEAL);
-          socket
-            .to(game.room.code)
-            .emit("planned_phase_change", Phases.NIGHT, Date.now() + config.ROLE_REVEAL_TIMEOUT_MS);
-          game.timer = new Timer(config.ROLE_REVEAL_TIMEOUT_MS);
-          // game.timer.start(this.update(game));
-          return Phases.ROLE_REVEAL;
-        } else {
-          // TODO: RESTART VOTING
-          // socket something
-          socket
-            .to(game.room.code)
-            .emit("planned_phase_change", Phases.ROLE_REVEAL, Date.now() + config.VOTING_TIMEOUT_MS);
-          game.timer = new Timer(config.VOTING_TIMEOUT_MS);
-          // game.timer.start(this.update(game));
-          return null;
-        }
-      }
-      return null;
-    },
-    [Phases.ROLE_REVEAL]: function (game: Game, socket: MASocket): Phases | null {
-      if (game.timer.isRunning) {
-        return null;
-      }
+  /**
+   * Change current phase to @param phase. Broadcast this change to all players in in @param game using @param socket.
+   * Additionally if @param phase_after_timeout then set `phase` timer and broadcast `phase_after_timeout` as planned
+   * using default values from configuration
+   *
+   * @param phase - phase to change to
+   * @param game - current game instance
+   * @param socket - socket.io server socket
+   * @param phase_after_timeout - optional, if set then `phase` timer is set and `phase_after_timeout` is broadcasted as planned
+   * @returns
+   */
+  change_to(phase: Phases, game: Game, socket: MASocket, phase_after_timeout?: Phases | null) {
+    if (this.current != phase) {
+      this.current = phase;
+      socket.to(game.room.code).emit("phase_updated", phase);
+    }
+    if (phase_after_timeout != null) {
+      const timeout_ms = config.TIMEOUTS_MS.get(phase);
+      if (timeout_ms === undefined) return;
+      socket.to(game.room.code).emit("planned_phase_change", phase_after_timeout, Date.now() + timeout_ms);
+      game.timer = new Timer(timeout_ms);
+      game.timer.start(() => this.update(game, socket));
+    }
+  }
 
-      // TODO: send revealed role
-      if (game.check_game_end()) {
-        socket.to(game.room.code).emit("phase_updated", Phases.GAME_END);
-        // TODO: send winner (MAFIA or CITIZENS)
-        return Phases.GAME_END;
-      } else {
-        socket.to(game.room.code).emit("phase_updated", Phases.NIGHT);
-        socket
-          .to(game.room.code)
-          .emit("planned_phase_change", Phases.BODYGUARD_DEFENSE, Date.now() + config.NIGHT_TIMEOUT_MS);
-        game.timer = new Timer(config.NIGHT_TIMEOUT_MS);
-        // game.timer.start(this.update(game));
-        return Phases.NIGHT;
-      }
-    },
-    [Phases.NIGHT]: function (game: Game, socket: MASocket): Phases | null {
-      if (!game.timer.isRunning) {
-        socket.to(game.room.code).emit("phase_updated", Phases.BODYGUARD_DEFENSE);
-        socket
-          .to(game.room.code)
-          .emit("planned_phase_change", Phases.DETECTIVE_CHECK, Date.now() + config.BODYGUARD_DEFENSE_TIMEOUT_MS);
-        game.timer = new Timer(config.BODYGUARD_DEFENSE_TIMEOUT_MS);
-        // game.timer.start(this.update(game));
-        return Phases.BODYGUARD_DEFENSE;
-      }
-      return null;
-    },
-    [Phases.BODYGUARD_DEFENSE]: function (game: Game, socket: MASocket): Phases | null {
-      if (game.bodyguard_appointed() || !game.timer.isRunning) {
-        socket.to(game.room.code).emit("phase_updated", Phases.DETECTIVE_CHECK);
-        socket
-          .to(game.room.code)
-          .emit("planned_phase_change", Phases.MAFIA_VOTING, Date.now() + config.DETECTIVE_CHECK_TIMEOUT_MS);
-        game.timer = new Timer(config.DETECTIVE_CHECK_TIMEOUT_MS);
-        // game.timer.start(this.update(game));
-        return Phases.DETECTIVE_CHECK;
-      }
-      return null;
-    },
-    [Phases.DETECTIVE_CHECK]: function (game: Game, socket: MASocket): Phases | null {
-      if (game.detective_appointed() || !game.timer.isRunning) {
-        socket.to(game.room.code).emit("phase_updated", Phases.MAFIA_VOTING);
-        socket
-          .to(game.room.code)
-          .emit("planned_phase_change", Phases.ROUND_END, Date.now() + config.MAFIA_VOTE_TIMEOUT_MS);
-        game.timer = new Timer(config.MAFIA_VOTE_TIMEOUT_MS);
-        // game.timer.start(this.update(game));
-        return Phases.MAFIA_VOTING;
-      }
-      return null;
-    },
-    [Phases.MAFIA_VOTING]: function (game: Game, socket: MASocket): Phases | null {
-      const num_mafia = game.room.getPlayers().filter((p: Player) => {
-        return p.role === Roles.MAFIOSO;
-      }).length;
-      if (sum(game.mafia_vote) === num_mafia || !game.timer.isRunning) {
-        const winners = Game.find_winners(game.mafia_vote);
-        if (winners.length == 1) {
-          socket.to(game.room.code).emit("phase_updated", Phases.ROUND_END);
-          socket
-            .to(game.room.code)
-            .emit("planned_phase_change", Phases.DEBATE, Date.now() + config.ROUND_END_TIMEMOUT_MS);
-          game.timer = new Timer(config.ROUND_END_TIMEMOUT_MS);
-          // game.timer.start(this.update(game));
-          return Phases.ROUND_END;
-        } else {
-          // TODO: RESTART MAFIA_VOTING
-          // socket something
-          socket
-            .to(game.room.code)
-            .emit("planned_phase_change", Phases.ROUND_END, Date.now() + config.MAFIA_VOTE_TIMEOUT_MS);
-          game.timer = new Timer(config.MAFIA_VOTE_TIMEOUT_MS);
-          // game.timer.start(this.update(game));
-          return null;
-        }
-      }
-      return null;
-    },
-    [Phases.ROUND_END]: function (game: Game, socket: MASocket): Phases | null {
-      if (game.timer.isRunning) {
-        return null;
-      }
-
-      if (game.check_game_end()) {
-        socket.to(game.room.code).emit("phase_updated", Phases.GAME_END);
-        socket
-          .to(game.room.code)
-          .emit("planned_phase_change", Phases.GAME_END, Date.now() + config.GAME_END_TIMEOUT_MS);
-        game.timer = new Timer(config.GAME_END_TIMEOUT_MS);
-        // game.timer.start(this.update(game));
-        return Phases.GAME_END;
-      } else {
-        socket.to(game.room.code).emit("phase_updated", Phases.DEBATE);
-        socket.to(game.room.code).emit("planned_phase_change", Phases.VOTING, Date.now() + config.DEBATE_TIMEOUT_MS);
-        game.timer = new Timer(config.DEBATE_TIMEOUT_MS);
-        // game.timer.start(this.update(game));
-        return Phases.DEBATE;
-      }
-    },
-    [Phases.GAME_END]: function (game: Game, socket: MASocket): Phases | null {
-      if (!game.timer.isRunning) {
-        socket.to(game.room.code).emit("phase_updated", Phases.LOBBY);
-        return Phases.LOBBY;
-      }
-      return null;
-    },
-  };
-
+  /**
+   * Update current phase as specified by the flowchart
+   * https://discord.com/channels/768494845634412624/1315074188519804928/1345725803278897214
+   * Meant to be run on almost all incoming server socket events.
+   *
+   * @param game - current game instance
+   * @param socket - socket.io server socket
+   * @returns
+   */
   update(game: Game, socket: MASocket) {
-    const transition = this.phases[this.current](game, socket);
-    if (transition) this.current = transition;
+    switch (this.current) {
+      case Phases.LOBBY:
+        if (game.room.check_is_room_ready()) {
+          this.change_to(Phases.ROLE_ASSIGNMENT, game, socket, Phases.WELCOME);
+        }
+      case Phases.ROLE_ASSIGNMENT:
+        const some_player_has_no_role = game.room.getPlayers().some((player: Player) => {
+          null_or_undefined(player.role) && player.online;
+        });
+        if (!some_player_has_no_role && !game.timer.isRunning) {
+          this.change_to(Phases.WELCOME, game, socket, Phases.DEBATE);
+        }
+      case Phases.WELCOME:
+        if (!game.timer.isRunning) {
+          this.change_to(Phases.DEBATE, game, socket, Phases.VOTING);
+        }
+      case Phases.DEBATE:
+        if (game.room.check_is_room_ready() || !game.timer.isRunning) {
+          this.change_to(Phases.VOTING, game, socket, Phases.ROLE_REVEAL);
+        }
+      case Phases.VOTING:
+        if (!game.timer.isRunning || sum(game.common_vote) === game.room.getPlayers().length) {
+          const winners = Game.find_winners(game.common_vote);
+          if (winners.length == 1) {
+            this.change_to(Phases.ROLE_REVEAL, game, socket, Phases.NIGHT);
+          } else {
+            // TODO: RESTART VOTING
+            // socket something
+            this.change_to(Phases.VOTING, game, socket, Phases.ROLE_REVEAL);
+          }
+        }
+      case Phases.ROLE_REVEAL:
+        if (!game.timer.isRunning) {
+          // TODO: send revealed role
+          if (game.check_game_end()) {
+            this.change_to(Phases.GAME_END, game, socket, null);
+            // TODO: send winner (MAFIA or CITIZENS)
+          } else {
+            this.change_to(Phases.NIGHT, game, socket, Phases.BODYGUARD_DEFENSE);
+          }
+        }
+      case Phases.NIGHT:
+        if (!game.timer.isRunning) {
+          this.change_to(Phases.BODYGUARD_DEFENSE, game, socket, Phases.DETECTIVE_CHECK);
+        }
+      case Phases.BODYGUARD_DEFENSE:
+        if (game.bodyguard_appointed() || !game.timer.isRunning) {
+          this.change_to(Phases.DETECTIVE_CHECK, game, socket, Phases.MAFIA_VOTING);
+        }
+      case Phases.DETECTIVE_CHECK:
+        if (game.detective_appointed() || !game.timer.isRunning) {
+          this.change_to(Phases.MAFIA_VOTING, game, socket, Phases.ROUND_END);
+        }
+      case Phases.MAFIA_VOTING:
+        const num_mafia = game.room.getPlayers().filter((p: Player) => {
+          return p.role === Roles.MAFIOSO && p.online;
+        }).length;
+        if (sum(game.mafia_vote) === num_mafia || !game.timer.isRunning) {
+          const winners = Game.find_winners(game.mafia_vote);
+          if (winners.length == 1) {
+            this.change_to(Phases.ROUND_END, game, socket, Phases.DEBATE);
+          } else {
+            // TODO: RESTART MAFIA_VOTING
+            // socket something
+            this.change_to(Phases.MAFIA_VOTING, game, socket, Phases.ROUND_END);
+          }
+        }
+      case Phases.ROUND_END:
+        if (!game.timer.isRunning) {
+          if (game.check_game_end()) {
+            this.change_to(Phases.GAME_END, game, socket, null);
+          } else {
+            this.change_to(Phases.DEBATE, game, socket, Phases.VOTING);
+          }
+        }
+      case Phases.GAME_END:
+        if (!game.timer.isRunning) {
+          this.change_to(Phases.LOBBY, game, socket, null);
+        }
+    }
   }
 }

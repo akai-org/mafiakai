@@ -2,10 +2,6 @@ import { Phases } from "@global/Game";
 import { PhaseRouter, Player, Room, Timer } from ".";
 import { Roles } from "@global/Roles";
 
-function null_or_undefined(x: any | null | undefined) {
-  return x === null || x === undefined;
-}
-
 export class Game {
   phase = new PhaseRouter(Phases.LOBBY);
   timer = new Timer(0); // 5 seconds

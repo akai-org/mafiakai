@@ -1,3 +1,4 @@
+import { Roles } from "@global/Roles";
 import { Timer } from "./Timer";
 import crypto from "node:crypto";
 
@@ -8,9 +9,12 @@ export class Game {
   chosen_by_detective: string = "";
   chosen_by_bodyguard: string = "";
 
-  mafia_room: string = crypto.randomUUID();
-  detective_room: string = crypto.randomUUID();
-  bodyguard_room: string = crypto.randomUUID();
+  readonly socket_rooms = new Map<Roles, string>([
+    [Roles.REGULAR_CITIZEN, crypto.randomUUID()],
+    [Roles.MAFIOSO, crypto.randomUUID()],
+    [Roles.DETECTIVE, crypto.randomUUID()],
+    [Roles.BODYGUARD, crypto.randomUUID()],
+  ]);
 
   private static find_winners(map: Map<string, number>) {
     var max: number = 0;

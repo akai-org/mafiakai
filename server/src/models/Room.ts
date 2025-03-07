@@ -3,11 +3,13 @@ import { Player } from "./Player";
 import { Roles } from "@global/Roles";
 import { config } from "@/constants";
 import { RoomModel } from "@global/RoomModel";
+import { Game } from "./Game";
 
 export class Room implements RoomModel {
   code: string;
   players = new Map<string, Player>();
   phase: Phases = Phases.LOBBY;
+  game: Game = new Game();
 
   constructor(code: string) {
     this.code = code;
@@ -99,6 +101,24 @@ export class Room implements RoomModel {
     }
 
     return true;
+  }
+
+  check_game_end(): boolean {
+    const mafia_len = this.getPlayers().filter((p: Player) => {
+      return p.role === Roles.MAFIOSO;
+    }).length;
+    const non_mafia_len = this.getPlayers().filter((p: Player) => {
+      return !(p.role === Roles.MAFIOSO);
+    }).length;
+    return mafia_len >= non_mafia_len || mafia_len == 0;
+  }
+
+  bodyguard_appointed(): boolean {
+    return this.game.chosen_by_bodyguard.length > 1 && this.hasPlayer(this.game.chosen_by_bodyguard);
+  }
+
+  detective_appointed(): boolean {
+    return this.game.chosen_by_detective.length > 1 && this.hasPlayer(this.game.chosen_by_detective);
   }
 }
 

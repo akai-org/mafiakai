@@ -1,4 +1,5 @@
 import type { Phases } from "./Game";
+import { PlayerModel } from "./PlayerModel";
 import { Roles } from "./Roles";
 
 type timestamp = number;
@@ -9,16 +10,19 @@ export interface Server2ClientEvents {
   phase_updated: (phase: Phases) => void;
   planned_phase_change: (phase: Phases, when: timestamp) => void; // Notifies about upcoming changes to phases with a numeric unix timestamp in milliseconds (Date.now())
   set_player_role: (role: Roles) => void;
+  send_detective_check: (player: PlayerModel) => void;
+  send_voting_result: (is_decisive: boolean, player: PlayerModel | null) => void;
+  end_game: (winner: Roles.MAFIOSO | Roles.REGULAR_CITIZEN) => void;
+  night_summary: (died: Array<PlayerModel>, saved: Array<PlayerModel>) => void;
 }
 
 export type ConnectionInfoData = { playerId: string };
-export type ResponseHandler = (message: string) => void;
 
 export interface Client2ServerEvents {
-  set_position: (position: number, callback: ResponseHandler) => void;
-  vote: (player_id: string) => void;
+  set_position: (position: number) => void;
   send_player_name: (playerName: string) => void;
   set_ready: () => void;
+  vote: (player_id: string) => void;
 }
 
 export interface InterServerEvents {

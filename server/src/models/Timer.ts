@@ -27,7 +27,7 @@ export class Timer {
   }
 
   start(callback: () => void) {
-    clearTimeout(this.timeout_id!);
+    if (this.isRunning) return;
     this.isRunning = true;
     this.until = Date.now() + this.time;
     this.callback = callback;
@@ -35,5 +35,11 @@ export class Timer {
       this.isRunning = false;
       callback();
     }, this.time);
+  }
+
+  clear() {
+    if (this.timeout_id) clearTimeout(this.timeout_id);
+    this.until = null;
+    this.isRunning = false;
   }
 }

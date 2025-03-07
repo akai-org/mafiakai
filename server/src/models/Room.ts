@@ -130,6 +130,7 @@ export class Room implements RoomModel {
    * @returns
    */
   change_to(phase: Phases) {
+    this.game.timer.clear();
     if (this.phase != phase) {
       this.phase = phase;
       socketsServer.to(this.code).emit("phase_updated", phase);
@@ -161,7 +162,7 @@ export class Room implements RoomModel {
       case Phases.LOBBY:
         if (this.check_is_room_ready()) {
           this.change_to(Phases.ROLE_ASSIGNMENT);
-          this.setup_phase_timeout(Phases.WELCOME, config.TIMEOUTS_MS.get(Phases.ROLE_ASSIGNMENT)!, () => {});
+          this.setup_phase_timeout(Phases.WELCOME, config.TIMEOUTS_MS.get(Phases.ROLE_ASSIGNMENT)!);
         }
       case Phases.ROLE_ASSIGNMENT:
         const some_player_has_no_role = this.getPlayers().some((player: Player) => {
@@ -195,7 +196,9 @@ export class Room implements RoomModel {
       case Phases.DEBATE:
         if (this.check_is_room_ready() || !this.game.timer.isRunning) {
           this.change_to(Phases.VOTING);
-          this.setup_phase_timeout(Phases.ROLE_REVEAL, config.TIMEOUTS_MS.get(Phases.VOTING)!);
+          this.setup_phase_timeout(Phases.ROLE_REVEAL, config.TIMEOUTS_MS.get(Phases.VOTING)!, () => {
+            socketsServer.to(this.code).emit("send_voting_result", false, null);
+          });
         }
       case Phases.VOTING:
         if (!this.game.timer.isRunning || sum(this.game.common_vote) === this.getPlayers().length) {
@@ -203,11 +206,14 @@ export class Room implements RoomModel {
           this.game.reset_votings();
           if (winners.length == 1) {
             this.change_to(Phases.ROLE_REVEAL);
+            socketsServer.to(this.code).emit("send_voting_result", true, this.getPlayer(winners.at(0)!)!);
             this.setup_phase_timeout(Phases.NIGHT, config.TIMEOUTS_MS.get(Phases.ROLE_REVEAL)!);
           } else {
             // RESTART VOTING
             this.change_to(Phases.VOTING);
-            this.setup_phase_timeout(Phases.ROLE_REVEAL, config.TIMEOUTS_MS.get(Phases.VOTING)!);
+            this.setup_phase_timeout(Phases.ROLE_REVEAL, config.TIMEOUTS_MS.get(Phases.VOTING)!, () => {
+              socketsServer.to(this.code).emit("send_voting_result", false, null);
+            });
           }
         }
       case Phases.ROLE_REVEAL:

@@ -6,6 +6,7 @@ import { RoomModel } from "@global/RoomModel";
 import { Game } from "./Game";
 import { Timer } from "./Timer";
 import { socketsServer } from "@/routes";
+import { MASocket } from "@/types";
 
 export class Room implements RoomModel {
   code: string;
@@ -164,11 +165,18 @@ export class Room implements RoomModel {
         if (some_player_has_no_role) {
           this.establish_roles();
           for (const player of this.getPlayers()) {
-            // socketServer: MAServer is required here
+            // Create socket.io channels for each specific role in the game room and assign players to these channels
+            socketsServer
+              .in(player.id)
+              .fetchSockets()
+              .then((matching_sockets) => {
+                const player_socket = matching_sockets.at(0)!;
+                player_socket.join(this.game.socket_rooms.get(player.role!)!);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
           }
-          // TODO: Generate rooms for each [(specific role) intersection (game room)]
-          // TODO: Add players to these rooms
-          // socket.to(p.id).emit("set_player_role", p.role!);
         }
         if (!this.game.timer.isRunning) {
           this.change_to(Phases.WELCOME, Phases.DEBATE);

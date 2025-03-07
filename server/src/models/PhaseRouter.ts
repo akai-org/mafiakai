@@ -16,31 +16,6 @@ function null_or_undefined(x: any | null | undefined) {
   return x === null || x === undefined;
 }
 
-// if (check_is_room_ready(room)) {
-//   const one_second = 1_000;
-//   socket.to(room.code).emit("planned_phase_change", Phases.ROLE_ASSIGNMENT, Date.now() + one_second);
-//   setTimeout(() => {
-//     room.phase = Phases.ROLE_ASSIGNMENT;
-//     socket.to(room.code).emit("phase_updated", room.phase);
-//     if (!establish_roles(room)) {
-//       console.log("Inconsistent limits for the minimum number of players");
-//       return;
-//     }
-//     for (const p of room.getPlayers()) {
-//       // TODO: Generate rooms for each [(specific role) intersection (game room)]
-//       // TODO: Add players to these rooms
-//       socket.to(p.id).emit("set_player_role", p.role!);
-//     }
-//     room.phase = Phases.WELCOME;
-//     socket.to(room.code).emit("phase_updated", room.phase);
-//     socket.to(room.code).emit("planned_phase_change", Phases.DAY, Date.now() + 5 * one_second);
-//     setTimeout(() => {
-//       room.phase = Phases.DAY;
-//       socket.to(room.code).emit("phase_updated", room.phase);
-//     }, 5 * one_second);
-//   }, one_second);
-// }
-
 export class PhaseRouter {
   constructor(public current: Phases) {}
 
@@ -88,7 +63,16 @@ export class PhaseRouter {
         const some_player_has_no_role = game.room.getPlayers().some((player: Player) => {
           null_or_undefined(player.role) && player.online;
         });
-        if (!some_player_has_no_role && !game.timer.isRunning) {
+        if (some_player_has_no_role) {
+          game.room.establish_roles();
+          for (const player of game.room.getPlayers()) {
+            // socketServer: MAServer is required here
+          }
+          // TODO: Generate rooms for each [(specific role) intersection (game room)]
+          // TODO: Add players to these rooms
+          // socket.to(p.id).emit("set_player_role", p.role!);
+        }
+        if (!game.timer.isRunning) {
           this.change_to(Phases.WELCOME, game, socket, Phases.DEBATE);
         }
       case Phases.WELCOME:

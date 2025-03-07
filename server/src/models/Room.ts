@@ -6,7 +6,6 @@ import { RoomModel } from "@global/RoomModel";
 import { Game } from "./Game";
 import { Timer } from "./Timer";
 import { socketsServer } from "@/routes";
-import { MASocket } from "@/types";
 
 export class Room implements RoomModel {
   code: string;
@@ -192,17 +191,17 @@ export class Room implements RoomModel {
       case Phases.VOTING:
         if (!this.game.timer.isRunning || sum(this.game.common_vote) === this.getPlayers().length) {
           const winners = this.game.find_common_vote_winners();
+          this.game.reset_votings();
           if (winners.length == 1) {
             this.change_to(Phases.ROLE_REVEAL, Phases.NIGHT);
           } else {
-            // TODO: RESTART VOTING
-            // socket something
+            // RESTART VOTING
             this.change_to(Phases.VOTING, Phases.ROLE_REVEAL);
           }
         }
       case Phases.ROLE_REVEAL:
+        // TODO: send revealed role
         if (!this.game.timer.isRunning) {
-          // TODO: send revealed role
           if (this.check_game_end()) {
             this.change_to(Phases.GAME_END, null);
             // TODO: send winner (MAFIA or CITIZENS)
@@ -228,11 +227,11 @@ export class Room implements RoomModel {
         }).length;
         if (sum(this.game.mafia_vote) === num_mafia || !this.game.timer.isRunning) {
           const winners = this.game.find_mafia_vote_winners();
+          this.game.reset_votings();
           if (winners.length == 1) {
             this.change_to(Phases.ROUND_END, Phases.DEBATE);
           } else {
-            // TODO: RESTART MAFIA_VOTING
-            // socket something
+            // RESTART MAFIA_VOTING
             this.change_to(Phases.MAFIA_VOTING, Phases.ROUND_END);
           }
         }

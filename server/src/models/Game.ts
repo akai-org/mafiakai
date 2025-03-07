@@ -37,4 +37,11 @@ export class Game {
   find_common_vote_winners() {
     return Game.find_winners(this.common_vote);
   }
+
+  reset_votings() {
+    this.common_vote = new Map<string, number>();
+    this.mafia_vote = new Map<string, number>();
+    this.chosen_by_detective = "";
+    this.chosen_by_bodyguard = "";
+  }
 }

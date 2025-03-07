@@ -125,25 +125,30 @@ export class Room implements RoomModel {
 
   /**
    * Change current phase to @param phase. Broadcast this change to all players in in @param room using @param socket.
-   * Additionally if @param phase_after_timeout then set `phase` timer and broadcast `phase_after_timeout` as planned
-   * using default values from configuration
    *
    * @param phase - phase to change to
-   * @param phase_after_timeout - optional, if set then `phase` timer is set and `phase_after_timeout` is broadcasted as planned
    * @returns
    */
-  change_to(phase: Phases, phase_after_timeout?: Phases | null) {
+  change_to(phase: Phases) {
     if (this.phase != phase) {
       this.phase = phase;
       socketsServer.to(this.code).emit("phase_updated", phase);
     }
-    if (phase_after_timeout != null) {
-      const timeout_ms = config.TIMEOUTS_MS.get(phase);
-      if (timeout_ms === undefined) return;
-      socketsServer.to(this.code).emit("planned_phase_change", phase_after_timeout, Date.now() + timeout_ms);
-      this.game.timer = new Timer(timeout_ms);
-      this.game.timer.start(() => this.update());
-    }
+  }
+
+  /**
+   * Set timer and broadcast `phase_after_timeout` as planned after `timeout_ms`.
+   * Additionally run `run_before_switch` before changing phases.
+   *
+   * @param phase_after_timeout phase to broadcast as planned
+   * @param timeout_ms timeout in milliseconds
+   * @param run_before_switch any code to run before switching to this phase
+   */
+  setup_phase_timeout(phase_after_timeout: Phases, timeout_ms: number, run_before_switch?: () => void) {
+    if (run_before_switch) run_before_switch();
+    socketsServer.to(this.code).emit("planned_phase_change", phase_after_timeout, Date.now() + timeout_ms);
+    this.game.timer = new Timer(timeout_ms);
+    this.game.timer.start(() => this.update());
   }
 
   /**
@@ -155,7 +160,8 @@ export class Room implements RoomModel {
     switch (this.phase) {
       case Phases.LOBBY:
         if (this.check_is_room_ready()) {
-          this.change_to(Phases.ROLE_ASSIGNMENT, Phases.WELCOME);
+          this.change_to(Phases.ROLE_ASSIGNMENT);
+          this.setup_phase_timeout(Phases.WELCOME, config.TIMEOUTS_MS.get(Phases.ROLE_ASSIGNMENT)!, () => {});
         }
       case Phases.ROLE_ASSIGNMENT:
         const some_player_has_no_role = this.getPlayers().some((player: Player) => {
@@ -178,48 +184,57 @@ export class Room implements RoomModel {
           }
         }
         if (!this.game.timer.isRunning) {
-          this.change_to(Phases.WELCOME, Phases.DEBATE);
+          this.change_to(Phases.WELCOME);
+          this.setup_phase_timeout(Phases.DEBATE, config.TIMEOUTS_MS.get(Phases.WELCOME)!);
         }
       case Phases.WELCOME:
         if (!this.game.timer.isRunning) {
-          this.change_to(Phases.DEBATE, Phases.VOTING);
+          this.change_to(Phases.DEBATE);
+          this.setup_phase_timeout(Phases.VOTING, config.TIMEOUTS_MS.get(Phases.DEBATE)!);
         }
       case Phases.DEBATE:
         if (this.check_is_room_ready() || !this.game.timer.isRunning) {
-          this.change_to(Phases.VOTING, Phases.ROLE_REVEAL);
+          this.change_to(Phases.VOTING);
+          this.setup_phase_timeout(Phases.ROLE_REVEAL, config.TIMEOUTS_MS.get(Phases.VOTING)!);
         }
       case Phases.VOTING:
         if (!this.game.timer.isRunning || sum(this.game.common_vote) === this.getPlayers().length) {
           const winners = this.game.find_common_vote_winners();
           this.game.reset_votings();
           if (winners.length == 1) {
-            this.change_to(Phases.ROLE_REVEAL, Phases.NIGHT);
+            this.change_to(Phases.ROLE_REVEAL);
+            this.setup_phase_timeout(Phases.NIGHT, config.TIMEOUTS_MS.get(Phases.ROLE_REVEAL)!);
           } else {
             // RESTART VOTING
-            this.change_to(Phases.VOTING, Phases.ROLE_REVEAL);
+            this.change_to(Phases.VOTING);
+            this.setup_phase_timeout(Phases.ROLE_REVEAL, config.TIMEOUTS_MS.get(Phases.VOTING)!);
           }
         }
       case Phases.ROLE_REVEAL:
         // TODO: send revealed role
         if (!this.game.timer.isRunning) {
           if (this.check_game_end()) {
-            this.change_to(Phases.GAME_END, null);
+            this.change_to(Phases.GAME_END);
             // TODO: send winner (MAFIA or CITIZENS)
           } else {
-            this.change_to(Phases.NIGHT, Phases.BODYGUARD_DEFENSE);
+            this.change_to(Phases.NIGHT);
+            this.setup_phase_timeout(Phases.BODYGUARD_DEFENSE, config.TIMEOUTS_MS.get(Phases.NIGHT)!);
           }
         }
       case Phases.NIGHT:
         if (!this.game.timer.isRunning) {
-          this.change_to(Phases.BODYGUARD_DEFENSE, Phases.DETECTIVE_CHECK);
+          this.change_to(Phases.BODYGUARD_DEFENSE);
+          this.setup_phase_timeout(Phases.DETECTIVE_CHECK, config.TIMEOUTS_MS.get(Phases.BODYGUARD_DEFENSE)!);
         }
       case Phases.BODYGUARD_DEFENSE:
         if (this.bodyguard_appointed() || !this.game.timer.isRunning) {
-          this.change_to(Phases.DETECTIVE_CHECK, Phases.MAFIA_VOTING);
+          this.change_to(Phases.DETECTIVE_CHECK);
+          this.setup_phase_timeout(Phases.MAFIA_VOTING, config.TIMEOUTS_MS.get(Phases.DETECTIVE_CHECK)!);
         }
       case Phases.DETECTIVE_CHECK:
         if (this.detective_appointed() || !this.game.timer.isRunning) {
-          this.change_to(Phases.MAFIA_VOTING, Phases.ROUND_END);
+          this.change_to(Phases.MAFIA_VOTING);
+          this.setup_phase_timeout(Phases.ROUND_END, config.TIMEOUTS_MS.get(Phases.MAFIA_VOTING)!);
         }
       case Phases.MAFIA_VOTING:
         const num_mafia = this.getPlayers().filter((p: Player) => {
@@ -229,23 +244,26 @@ export class Room implements RoomModel {
           const winners = this.game.find_mafia_vote_winners();
           this.game.reset_votings();
           if (winners.length == 1) {
-            this.change_to(Phases.ROUND_END, Phases.DEBATE);
+            this.change_to(Phases.ROUND_END);
+            this.setup_phase_timeout(Phases.DEBATE, config.TIMEOUTS_MS.get(Phases.ROUND_END)!);
           } else {
             // RESTART MAFIA_VOTING
-            this.change_to(Phases.MAFIA_VOTING, Phases.ROUND_END);
+            this.change_to(Phases.MAFIA_VOTING);
+            this.setup_phase_timeout(Phases.ROUND_END, config.TIMEOUTS_MS.get(Phases.MAFIA_VOTING)!);
           }
         }
       case Phases.ROUND_END:
         if (!this.game.timer.isRunning) {
           if (this.check_game_end()) {
-            this.change_to(Phases.GAME_END, null);
+            this.change_to(Phases.GAME_END);
           } else {
-            this.change_to(Phases.DEBATE, Phases.VOTING);
+            this.change_to(Phases.DEBATE);
+            this.setup_phase_timeout(Phases.VOTING, config.TIMEOUTS_MS.get(Phases.DEBATE)!);
           }
         }
       case Phases.GAME_END:
         if (!this.game.timer.isRunning) {
-          this.change_to(Phases.LOBBY, null);
+          this.change_to(Phases.LOBBY);
         }
     }
   }

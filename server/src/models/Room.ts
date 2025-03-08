@@ -105,14 +105,17 @@ export class Room implements RoomModel {
     return true;
   }
 
-  check_game_end(): boolean {
+  check_game_end(): Roles.MAFIOSO | Roles.REGULAR_CITIZEN | null {
     const mafia_len = this.getPlayers().filter((p: Player) => {
       return p.role === Roles.MAFIOSO;
     }).length;
     const non_mafia_len = this.getPlayers().filter((p: Player) => {
       return !(p.role === Roles.MAFIOSO);
     }).length;
-    return mafia_len >= non_mafia_len || mafia_len == 0;
+
+    if (mafia_len >= non_mafia_len) return Roles.MAFIOSO;
+    else if (mafia_len == 0) return Roles.REGULAR_CITIZEN;
+    else return null;
   }
 
   bodyguard_appointed(): boolean {
@@ -183,6 +186,10 @@ export class Room implements RoomModel {
                 console.log(error);
               });
           }
+          for (const role in Roles) {
+            const role1: Roles = role as Roles;
+            socketsServer.in(this.game.socket_rooms.get(role1)!).emit("set_player_role", role1);
+          }
         }
         if (!this.game.timer.isRunning) {
           this.change_to(Phases.WELCOME);
@@ -217,11 +224,12 @@ export class Room implements RoomModel {
           }
         }
       case Phases.ROLE_REVEAL:
-        // TODO: send revealed role
         if (!this.game.timer.isRunning) {
-          if (this.check_game_end()) {
+          const game_status = this.check_game_end();
+          if (game_status !== null) {
             this.change_to(Phases.GAME_END);
-            // TODO: send winner (MAFIA or CITIZENS)
+            // send winner (MAFIA or CITIZENS)
+            socketsServer.to(this.code).emit("end_game", game_status);
           } else {
             this.change_to(Phases.NIGHT);
             this.setup_phase_timeout(Phases.BODYGUARD_DEFENSE, config.TIMEOUTS_MS.get(Phases.NIGHT)!);
@@ -235,10 +243,15 @@ export class Room implements RoomModel {
       case Phases.BODYGUARD_DEFENSE:
         if (this.bodyguard_appointed() || !this.game.timer.isRunning) {
           this.change_to(Phases.DETECTIVE_CHECK);
-          this.setup_phase_timeout(Phases.MAFIA_VOTING, config.TIMEOUTS_MS.get(Phases.DETECTIVE_CHECK)!);
+          this.setup_phase_timeout(Phases.MAFIA_VOTING, config.TIMEOUTS_MS.get(Phases.DETECTIVE_CHECK)!, () => {
+            socketsServer.to(this.game.socket_rooms.get(Roles.DETECTIVE)!).emit("send_detective_check", null);
+          });
         }
       case Phases.DETECTIVE_CHECK:
         if (this.detective_appointed() || !this.game.timer.isRunning) {
+          socketsServer
+            .to(this.game.socket_rooms.get(Roles.DETECTIVE)!)
+            .emit("send_detective_check", this.getPlayer(this.game.chosen_by_detective) ?? null);
           this.change_to(Phases.MAFIA_VOTING);
           this.setup_phase_timeout(Phases.ROUND_END, config.TIMEOUTS_MS.get(Phases.MAFIA_VOTING)!);
         }
@@ -248,9 +261,20 @@ export class Room implements RoomModel {
         }).length;
         if (sum(this.game.mafia_vote) === num_mafia || !this.game.timer.isRunning) {
           const winners = this.game.find_mafia_vote_winners();
+          const saved = this.game.chosen_by_bodyguard;
           this.game.reset_votings();
           if (winners.length == 1) {
             this.change_to(Phases.ROUND_END);
+            if (winners.at(0) === saved) {
+              const saved_player = this.getPlayer(saved);
+              if (saved_player) {
+                socketsServer.to(this.code).emit("night_summary", null, { ...saved_player, role: null });
+              } else {
+                socketsServer.to(this.code).emit("night_summary", null, null);
+              }
+            } else {
+              socketsServer.to(this.code).emit("night_summary", this.getPlayer(winners.at(0) ?? "") ?? null, null);
+            }
             this.setup_phase_timeout(Phases.DEBATE, config.TIMEOUTS_MS.get(Phases.ROUND_END)!);
           } else {
             // RESTART MAFIA_VOTING
@@ -260,8 +284,10 @@ export class Room implements RoomModel {
         }
       case Phases.ROUND_END:
         if (!this.game.timer.isRunning) {
-          if (this.check_game_end()) {
+          const game_status = this.check_game_end();
+          if (game_status !== null) {
             this.change_to(Phases.GAME_END);
+            socketsServer.to(this.code).emit("end_game", game_status);
           } else {
             this.change_to(Phases.DEBATE);
             this.setup_phase_timeout(Phases.VOTING, config.TIMEOUTS_MS.get(Phases.DEBATE)!);

@@ -1,45 +1,52 @@
-function null_or_undefined(x: any | null | undefined) {
-  return x === null || x === undefined;
-}
+import { InternalError } from "@/engine/InternalError";
 
 export class Timer {
   public isRunning = false;
+
+  private started_at: number | null = null;
+  private ended_at: number | null = null;
+
   private timeout_id: NodeJS.Timeout | null = null;
   private callback: (() => void) | null = null;
-  private until: number | null = null;
-  constructor(private time: number) {}
 
-  getUntil() {
-    return this.until;
+  constructor() {}
+
+  start(milliseconds: number, callback: () => void) {
+    if (this.isRunning) return;
+    this.isRunning = true;
+
+    this.started_at = Date.now();
+    this.ended_at = this.started_at + milliseconds;
+
+    this.callback = callback;
+    this.timeout_id = setTimeout(() => {
+      this.isRunning = false;
+      callback();
+    }, milliseconds);
   }
 
   extend(milliseconds: number) {
-    if (this.isRunning === false || null_or_undefined(this.timeout_id) || null_or_undefined(this.callback)) {
-      throw new Error("Nothing is scheduled.");
-    }
-    clearTimeout(this.timeout_id!);
-    this.isRunning = true;
-    this.until = Date.now() + milliseconds;
-    setTimeout(() => {
+    if (this.isRunning === false || !this.timeout_id || !this.callback || !this.ended_at)
+      throw new InternalError("cannotExtendTimer");
+
+    this.ended_at += milliseconds;
+
+    clearTimeout(this.timeout_id);
+    this.timeout_id = setTimeout(() => {
       this.isRunning = false;
       this.callback!();
     }, milliseconds);
   }
 
-  start(callback: () => void) {
-    if (this.isRunning) return;
-    this.isRunning = true;
-    this.until = Date.now() + this.time;
-    this.callback = callback;
-    this.timeout_id = setTimeout(() => {
-      this.isRunning = false;
-      callback();
-    }, this.time);
-  }
-
   clear() {
-    if (this.timeout_id) clearTimeout(this.timeout_id);
-    this.until = null;
+    if (this.timeout_id) {
+      clearTimeout(this.timeout_id);
+      this.timeout_id = null;
+      this.callback = null;
+      this.started_at = null;
+      this.ended_at = null;
+    }
+
     this.isRunning = false;
   }
 }

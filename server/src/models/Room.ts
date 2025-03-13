@@ -1,9 +1,9 @@
 import { Phases } from "@global/Game";
-import { Player } from "./Player";
+import { Player } from "../engine/PlayersManager/Player";
 import { Roles } from "@global/Roles";
 import { config } from "@/constants";
 import { RoomModel } from "@global/RoomModel";
-import { Game } from "./Game";
+import { Game } from "../engine/Game";
 import { Timer } from "./Timer";
 import { socketsServer } from "@/routes";
 

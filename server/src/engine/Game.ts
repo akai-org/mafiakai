@@ -1,13 +1,16 @@
 import { Roles } from "@global/Roles";
-import { Timer } from "./Timer";
+import { Timer } from "../models/Timer";
 import crypto from "node:crypto";
+import { PlayersManager } from "./PlayersManager/PlayersManager";
+import { PhasesManager } from "./PhasesManager/PhasesManager";
 
 export class Game {
   timer = new Timer(0); // 5 seconds
-  common_vote = new Map<string, number>();
-  mafia_vote = new Map<string, number>();
-  chosen_by_detective: string = "";
-  chosen_by_bodyguard: string = "";
+  players = new PlayersManager();
+  phase = new PhasesManager();
+
+  chosen_by_detective: string | null = null;
+  chosen_by_bodyguard: string | null = null;
 
   readonly socket_rooms = new Map<Roles, string>([
     [Roles.REGULAR_CITIZEN, crypto.randomUUID()],

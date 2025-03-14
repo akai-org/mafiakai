@@ -14,6 +14,10 @@ export class PlayersManager {
     this.players.set(playerId, new Player(playerId));
   }
 
+  remove(playerId: string) {
+    this.players.delete(playerId);
+  }
+
   has(playerId: string) {
     return this.players.has(playerId);
   }

@@ -4,14 +4,14 @@ import { Roles } from "@global/Roles";
 import { config } from "@/constants";
 import { RoomModel } from "@global/RoomModel";
 import { Game } from "../engine/Game";
-import { Timer } from "./Timer";
+import { Timer } from "../engine/PhasesManager/Timer";
 import { socketsServer } from "@/routes";
 
 export class Room implements RoomModel {
   code: string;
   players = new Map<string, Player>();
   phase: Phases = Phases.LOBBY;
-  game: Game = new Game();
+  // game: Game = new Game();
 
   constructor(code: string) {
     this.code = code;

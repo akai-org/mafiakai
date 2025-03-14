@@ -9,4 +9,5 @@ export interface PlayerModel {
   seat: number | null;
   name: string | null; // Real name of the player
   isReady: boolean;
+  alive: boolean;
 }

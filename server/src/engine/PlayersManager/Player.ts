@@ -8,6 +8,7 @@ export class Player implements PlayerModel {
   role: Roles | null = null;
   seat: number | null = null;
   name: string | null = null; // Real name of the player
+  alive: boolean = true;
   isReady: boolean = false;
 
   /** Vote changes its meaning depending on the game state [VOTING, MAFIA_VOTING] */

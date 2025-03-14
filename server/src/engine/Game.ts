@@ -5,7 +5,7 @@ import { PlayersManager } from "./PlayersManager/PlayersManager";
 import { PhasesManager } from "./PhasesManager/PhasesManager";
 
 export class Game {
-  timer = new Timer(0); // 5 seconds
+  timer = new Timer(); // 5 seconds
   players = new PlayersManager();
   phase = new PhasesManager();
 

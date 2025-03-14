@@ -26,6 +26,14 @@ export class PlayersManager {
     return Array.from(this.players.values());
   }
 
+  get citizens() {
+    return this.all.filter(({ role }) => role && role != Roles.MAFIOSO);
+  }
+
+  get mafia() {
+    return this.all.filter((player) => player.role === Roles.MAFIOSO);
+  }
+
   // Seat management
 
   setSeatFor(playerId: string, seat: number) {

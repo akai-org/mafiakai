@@ -1,3 +1,3 @@
-import { RoomManager } from "@/models";
+import { RoomManager } from "@/rooms/RoomManager";
 
 export const manager = new RoomManager();

@@ -28,6 +28,7 @@ export class PhasesManager {
     if (nextPhase === null) return;
 
     this._phase = nextPhase;
+    console.log(`Phase changed to ${Phases[nextPhase]}`);
     this.phaseHandlers[nextPhase].onEnter(game);
 
     const duration = this.phaseHandlers[nextPhase].duration;

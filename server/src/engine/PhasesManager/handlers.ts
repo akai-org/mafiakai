@@ -3,7 +3,8 @@ import { PhaseHandler } from "./PhasesManager";
 import { config } from "@/constants";
 import { InternalError } from "../InternalError";
 import { Roles } from "@global/Roles";
-import { Game, Player } from "@/models";
+import { Player } from "../PlayersManager/Player";
+import { Game } from "../Game";
 
 export const phaseHandlers: Record<Phases, PhaseHandler> = {
   [Phases.LOBBY]: {
@@ -151,7 +152,16 @@ export const phaseHandlers: Record<Phases, PhaseHandler> = {
   },
   [Phases.ROUND_END]: {
     duration: config.TIMEOUTS_MS[Phases.ROUND_END],
-    onEnter(game) {},
+    onEnter(game) {
+      // Mafia kills a player
+      const votes = game._players.mafia.map((player) => player.vote);
+      const playerVotes = new Map<string, number>();
+      for (const playerId of votes) {
+        if (playerId === null) continue;
+        playerVotes.set(playerId, (playerVotes.get(playerId) || 0) + 1);
+      }
+      // If there is a tie, mafia must vote again
+    },
     transition(game, isTimeup) {
       if (isTimeup) {
         if ((game._winner = IsGameOver(game))) return Phases.GAME_END;

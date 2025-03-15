@@ -10,28 +10,28 @@ describe("Game", async () => {
   });
 
   await it("should be able to add a player", () => {
-    game.players.add("player1");
+    game._players.add("player1");
 
-    strictEqual(game.players.all.length, 1);
+    strictEqual(game._players.all.length, 1);
 
-    game.players.add("player2");
+    game._players.add("player2");
 
-    strictEqual(game.players.all.length, 2);
+    strictEqual(game._players.all.length, 2);
 
-    ok(game.players.has("player1"));
-    ok(game.players.has("player2"));
+    ok(game._players.has("player1"));
+    ok(game._players.has("player2"));
   });
 
   await it("should be able to remove a player", () => {
-    game.players.remove("player1");
+    game._players.remove("player1");
 
-    strictEqual(game.players.all.length, 1);
+    strictEqual(game._players.all.length, 1);
 
-    ok(!game.players.has("player1"));
-    ok(game.players.has("player2"));
+    ok(!game._players.has("player1"));
+    ok(game._players.has("player2"));
   });
 
   await it("should be able to mark a player as ready", () => {
-    game.proccessReady("player2", true);
+    game.ready("player2", true);
   });
 });

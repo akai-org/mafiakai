@@ -1,6 +1,9 @@
 import { Phases } from "@global/Game";
 import { PhaseHandler } from "./PhasesManager";
 import { config } from "@/constants";
+import { InternalError } from "../InternalError";
+import { Roles } from "@global/Roles";
+import { Game, Player } from "@/models";
 
 export const phaseHandlers: Record<Phases, PhaseHandler> = {
   [Phases.LOBBY]: {
@@ -22,26 +25,27 @@ export const phaseHandlers: Record<Phases, PhaseHandler> = {
     onEnter(game) {
       // Since after shuffling the array the order of players should be random enough
       // the arbitrary indices can be modified to other numbers, but the ranges must be disjoint.
-      // const players_shuffled = shuffle(players);
-      // const detective = players_shuffled.at(0).id;
-      // const bodyguard = players_shuffled.at(1).id;
-      // const guaranteed_number_of_mafia = Math.floor(n / config.GUARANTEED_MAFIA_FOR_EACH_N_PLAYERS);
-      // const chance_for_another_mafioso =
-      //   (n % config.GUARANTEED_MAFIA_FOR_EACH_N_PLAYERS) / config.GUARANTEED_MAFIA_FOR_EACH_N_PLAYERS;
-      // const another_mafioso = Math.random() < chance_for_another_mafioso ? 1 : 0;
-      // const mafia_range_upper_bound_exclusive = 2 + guaranteed_number_of_mafia + another_mafioso;
-      // const mafia: Array<string> = players_shuffled.slice(2, mafia_range_upper_bound_exclusive).map((p: Player) => {
-      //   return p.id;
-      // });
-      // const regular_citizens = players_shuffled.slice(mafia_range_upper_bound_exclusive, n);
-      // this.setPlayerRole(detective, Roles.DETECTIVE);
-      // this.setPlayerRole(bodyguard, Roles.BODYGUARD);
-      // for (const m of mafia) {
-      //   this.setPlayerRole(m, Roles.MAFIOSO);
-      // }
-      // for (const c of regular_citizens) {
-      //   this.setPlayerRole(c, Roles.REGULAR_CITIZEN);
-      // }
+      const n = game._players.all.length;
+      const players_shuffled = shuffleFisherYates([...game._players.all]);
+
+      const detective = players_shuffled.at(0);
+      if (!detective) throw new InternalError("tooFewPlayers");
+      const bodyguard = players_shuffled.at(1);
+      if (!bodyguard) throw new InternalError("tooFewPlayers");
+
+      const guaranteed_number_of_mafia = Math.floor(n / config.GUARANTEED_MAFIA_FOR_EACH_N_PLAYERS);
+      const chance_for_another_mafioso =
+        (n % config.GUARANTEED_MAFIA_FOR_EACH_N_PLAYERS) / config.GUARANTEED_MAFIA_FOR_EACH_N_PLAYERS;
+
+      const another_mafioso = Math.random() < chance_for_another_mafioso ? 1 : 0;
+      const mafia_range_upper_bound_exclusive = 2 + guaranteed_number_of_mafia + another_mafioso;
+      const mafia = players_shuffled.slice(2, mafia_range_upper_bound_exclusive);
+      const regular_citizens = players_shuffled.slice(mafia_range_upper_bound_exclusive, n);
+
+      detective.role = Roles.DETECTIVE;
+      bodyguard.role = Roles.BODYGUARD;
+      for (const mafioso of mafia) mafioso.role = Roles.MAFIOSO;
+      for (const citizen of regular_citizens) citizen.role = Roles.REGULAR_CITIZEN;
     },
     transition(game, isTimeup) {
       if (isTimeup) return Phases.WELCOME;
@@ -76,15 +80,37 @@ export const phaseHandlers: Record<Phases, PhaseHandler> = {
   [Phases.ROLE_REVEAL]: {
     duration: config.TIMEOUTS_MS[Phases.ROLE_REVEAL],
     onEnter(game) {
-      // TODO:
-      // - kill player and reveal the role of the player
-      // or
-      // - nobody dies
+      const votes = game._players.all.map((player) => player.vote);
+
+      // Count votes
+      const playerVotes = new Map<string, number>();
+      for (const playerId of votes) {
+        if (playerId === null) continue;
+        playerVotes.set(playerId, (playerVotes.get(playerId) || 0) + 1);
+      }
+
+      // Get max votes
+      const maxVotes = Math.max(...playerVotes.values());
+      const maxVotedPlayers = [...playerVotes.entries()].filter(([, votes]) => votes === maxVotes).map(([id]) => id);
+
+      // Get max voted player
+      let player: Player | null = null;
+      if (maxVotedPlayers.length === 1) {
+        const p = game._players.get(maxVotedPlayers[0]);
+        if (!p) throw new InternalError("playerNotFound");
+        player = p;
+      }
+
+      // Reveal and kill player
+      if (player) {
+        player.alive = false;
+        player.revealed = true;
+        game._lastKilled = player.id;
+      }
     },
     transition(game, isTimeup) {
       if (isTimeup) {
-        // TODO: Check if the game is over (over ? Phases.GAME_END : Phases.NIGHT)
-
+        if ((game._winner = IsGameOver(game))) return Phases.GAME_END;
         return Phases.NIGHT;
       }
       return null;
@@ -128,7 +154,7 @@ export const phaseHandlers: Record<Phases, PhaseHandler> = {
     onEnter(game) {},
     transition(game, isTimeup) {
       if (isTimeup) {
-        // TODO: Check if the game is over (over ? Phases.GAME_END : Phases.DEBATE)
+        if ((game._winner = IsGameOver(game))) return Phases.GAME_END;
         return Phases.DEBATE;
       }
       return null;
@@ -151,4 +177,18 @@ function shuffleFisherYates<T extends any[]>(array: T): T {
     [array[i], array[j]] = [array[j], array[i]];
   }
   return array;
+}
+
+function IsGameOver(game: Game): "mafia" | "citizens" | null {
+  const mafiaCount = game._players.mafia.filter((player) => player.alive).length;
+  const citizensCount = game._players.citizens.filter((player) => player.alive).length;
+
+  if (mafiaCount >= citizensCount) {
+    return "mafia";
+  }
+  if (mafiaCount === 0) {
+    return "citizens";
+  }
+
+  return null;
 }

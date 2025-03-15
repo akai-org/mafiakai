@@ -12,4 +12,6 @@ const internalErrors = [
   "roomAlreadyExists",
   "cannotExtendTimer",
   "playerHasNoRole",
+  "tooFewPlayers",
+  "noOneVoted",
 ] as const;

@@ -27,10 +27,6 @@ export class PhasesManager {
     const nextPhase = this.phaseHandlers[this._phase].transition(game, !game._timer.isRunning);
     if (nextPhase === null) return;
 
-    // Reset
-    game._chosen_by_detective = null;
-    game._chosen_by_bodyguard = null;
-
     this._phase = nextPhase;
     this.phaseHandlers[nextPhase].onEnter(game);
 

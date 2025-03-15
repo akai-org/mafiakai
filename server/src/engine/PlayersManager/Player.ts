@@ -6,6 +6,7 @@ export class Player implements PlayerModel {
   online: boolean = true;
   persona: Persona = {};
   role: Roles | null = null;
+  guarded: boolean = false;
   seat: number | null = null;
   name: string | null = null; // Real name of the player
   alive: boolean = true;
@@ -13,6 +14,8 @@ export class Player implements PlayerModel {
 
   /** Vote changes its meaning depending on the game state [VOTING, MAFIA_VOTING] */
   vote: string | null = null;
+  /** Save information that player role was revealed */
+  revealed: boolean = false;
 
   constructor(public id: string) {}
 }

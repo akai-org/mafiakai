@@ -16,6 +16,8 @@ export class Game {
 
   _chosen_by_detective: string | null = null;
   _chosen_by_bodyguard: string | null = null;
+  _lastKilled: string | null = null; // Last player killed by citizens or mafia vote
+  _winner: "citizens" | "mafia" | null = null;
 
   // #####################################
   // Functions to make actions in the game

@@ -2,14 +2,14 @@ import { Phases } from "@global/Game";
 import { Game } from "../Game";
 import { phaseHandlers } from "./handlers";
 
-type Flags = "detectiveAppointed" | "bodyguardAppointed";
-
-export type PhaseHandler = { onEnter(game: Game): void; transition(game: Game): Phases | null };
+export type PhaseHandler = {
+  duration: number | null; // Duration of the phase in milliseconds or null if no timeout
+  onEnter(game: Game): void; // Called when the phase starts
+  transition(game: Game, isTimeup: boolean): Phases | null; // Return the next phase or null if the phase should not change
+};
 
 export class PhasesManager {
   private _phase: Phases = Phases.LOBBY; // Current phase
-  private _flags: Record<Flags, boolean> = { detectiveAppointed: false, bodyguardAppointed: false }; // Action flags
-
   private phaseHandlers: Record<Phases, PhaseHandler> = phaseHandlers;
 
   // Extra informations
@@ -18,30 +18,23 @@ export class PhasesManager {
 
   constructor() {}
 
-  // Flags management
-  raiseFlag(flag: Flags) {
-    this._flags[flag] = true;
-  }
-
-  lowerFlags() {
-    for (const flag of Object.keys(this._flags)) this._flags[flag as Flags] = false;
-  }
-
-  getFlag(flag: Flags) {
-    return this._flags[flag];
-  }
-
   // Phase management
   get current() {
     return this._phase;
   }
 
   update(game: Game): void {
-    const nextPhase = this.phaseHandlers[this._phase].transition(game);
+    const nextPhase = this.phaseHandlers[this._phase].transition(game, !game._timer.isRunning);
+    if (nextPhase === null) return;
 
-    if (nextPhase) {
-      this.phaseHandlers[nextPhase].onEnter(game);
-      this._phase = nextPhase;
-    }
+    // Reset
+    game._chosen_by_detective = null;
+    game._chosen_by_bodyguard = null;
+
+    this._phase = nextPhase;
+    this.phaseHandlers[nextPhase].onEnter(game);
+
+    const duration = this.phaseHandlers[nextPhase].duration;
+    if (duration !== null) game._timer.start(duration, () => this.update(game));
   }
 }

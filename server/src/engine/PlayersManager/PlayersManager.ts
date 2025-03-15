@@ -10,8 +10,10 @@ export class PlayersManager {
 
   // Player management
 
-  add(playerId: string) {
-    this.players.set(playerId, new Player(playerId));
+  add(playerId: string): Player {
+    const player = new Player(playerId);
+    this.players.set(playerId, player);
+    return player;
   }
 
   remove(playerId: string) {
@@ -36,6 +38,10 @@ export class PlayersManager {
 
   get mafia() {
     return this.all.filter((player) => player.role === Roles.MAFIOSO);
+  }
+
+  reset() {
+    /* TODO */
   }
 
   // Seat management

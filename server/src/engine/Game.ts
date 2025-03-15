@@ -1,70 +1,94 @@
 import { Phases } from "@global/Game";
-import { PayloadError } from "@global/PayloadErrors";
-import { PlayerModel } from "@global/PlayerModel";
 import { Roles } from "@global/Roles";
+import { PlayerModel } from "@global/PlayerModel";
+import { PayloadError } from "@global/PayloadErrors";
 import { InternalError } from "./InternalError";
+import { PlayersManager } from "./PlayersManager/PlayersManager";
 import { PhasesManager } from "./PhasesManager/PhasesManager";
 import { Timer } from "./PhasesManager/Timer";
-import { PlayersManager } from "./PlayersManager/PlayersManager";
 
 export class Game {
-  timer = new Timer(); // 5 seconds
-  players = new PlayersManager();
-  phase = new PhasesManager();
+  // "Private"
+  _timer = new Timer(); // 5 seconds
+  _players = new PlayersManager();
+  _phase = new PhasesManager();
+  // _state = new StateManager<GameModel>();
 
-  chosen_by_detective: string | null = null;
-  chosen_by_bodyguard: string | null = null;
+  _chosen_by_detective: string | null = null;
+  _chosen_by_bodyguard: string | null = null;
 
   // #####################################
   // Functions to make actions in the game
   // #####################################
 
-  proccessJoin(playerId: string) {
-    // TODO: Reconnection
-    if (this.phase.current !== Phases.LOBBY) throw new PayloadError("gameAlreadyStarted");
-    if (this.players.get(playerId)) throw new PayloadError("playerAlreadyExists");
+  join(playerId: string) {
+    let player = this._players.get(playerId);
 
-    this.players.add(playerId);
+    if (!player) {
+      // Player is not in the game, check if can join
+      if (this._phase.current !== Phases.LOBBY) throw new PayloadError("gameAlreadyStarted");
+      player = this._players.add(playerId);
+    } else {
+      // Player is already in the game, check if can reconnect
+      if (player.online) throw new PayloadError("playerIsAlreadyConnected");
+      player.online = true;
+    }
+
+    this._players.add(playerId);
+    this._phase.update(this);
   }
 
-  proccessLeave(playerId: string) {
-    // TOOD
+  leave(playerId: string) {
+    const player = this._players.get(playerId);
+    if (!player) throw new PayloadError("playerNotFound");
+
+    player.online = false;
+    if (this._phase.current === Phases.LOBBY) this._players.remove(playerId);
+
+    this._phase.update(this);
   }
 
-  proccessReady(playerId: string, ready: boolean) {
-    if (this.phase.current !== Phases.LOBBY) throw new PayloadError("gameAlreadyStarted");
-    const player = this.players.get(playerId);
+  ready(playerId: string, value: boolean) {
+    if (this._phase.current !== Phases.LOBBY) throw new PayloadError("gameAlreadyStarted");
+    const player = this._players.get(playerId);
     if (!player) throw new PayloadError("playerNotFound");
 
     // TODO: ??? any other checks ???
-    player.isReady = ready;
+    player.isReady = value;
+    this._phase.update(this);
   }
 
-  proccessVote(playerId: string, target: string) {
-    const player = this.players.get(playerId);
+  vote(playerId: string, target: string) {
+    const player = this._players.get(playerId);
     if (!player) throw new PayloadError("playerNotFound");
     if (!player.role) throw new InternalError("playerHasNoRole");
     if (!player.alive) throw new PayloadError("playerIsDead");
 
-    const citizenPass = this.phase.current == Phases.VOTING && player.role !== Roles.MAFIOSO;
-    const mafiaPass = this.phase.current == Phases.VOTING && player.role === Roles.MAFIOSO;
+    const citizenPass = this._phase.current == Phases.VOTING && player.role !== Roles.MAFIOSO;
+    const mafiaPass = this._phase.current == Phases.VOTING && player.role === Roles.MAFIOSO;
     if (!(citizenPass || mafiaPass)) throw new PayloadError("youCannotVoteNow");
 
-    const targetPlayer = this.players.get(target);
+    const targetPlayer = this._players.get(target);
     if (!targetPlayer) throw new PayloadError("targetNotFound");
     if (!targetPlayer.alive) throw new PayloadError("targetIsDead");
 
     // TODO: ??? any other checks ???
     player.vote = target;
+    this._phase.update(this);
   }
 
-  // #############################################
-  // Function to collect data
-  // #############################################
+  // ########################### //
+  // Function to collect data    //
+  // ########################### //
 
-  onPhaseChange: (phase: Phases) => void = () => {};
-  onPlayersChange: (playerId: string, playersState: PlayerModel[]) => void = () => {}; // playerId specific data, citizens don't need to know about mafia
-  onGameChange: (/*gameState: GameModel*/) => void = () => {};
+  onphasechange: (phase: Phases) => void = () => {};
+  ontimerchange: (start_at: number, end_at: number) => void = () => {};
+
+  onreveal: (playerId: string | null) => void = () => {};
+  onkilled: (playerId: string | null) => void = () => {};
+
+  onplayerschange: (playerId: string, playersState: PlayerModel[]) => void = () => {};
+  onerror: (error: PayloadError) => void = () => {};
 
   // readonly socket_rooms = new Map<Roles, string>([
   //   [Roles.REGULAR_CITIZEN, crypto.randomUUID()],

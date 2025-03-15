@@ -13,4 +13,5 @@ const payloadErrors = [
   "playerIsDead",
   "targetIsDead",
   "youCannotVoteNow",
+  "playerIsAlreadyConnected",
 ] as const;

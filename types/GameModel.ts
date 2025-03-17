@@ -6,8 +6,7 @@ export interface GameModel {
   phase: Phases;
   timer: { start_at: number; end_at: number };
 
-  lastRevealed: string | null;
-  lastKilled: string | null;
+  lastKilled: string | null; // last killed and revealed player
 
   players: PlayerModel[];
   error: PayloadError | null;

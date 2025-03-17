@@ -14,4 +14,5 @@ const internalErrors = [
   "playerHasNoRole",
   "tooFewPlayers",
   "noOneVoted",
+  "unknownRole",
 ] as const;

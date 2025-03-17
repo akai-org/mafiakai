@@ -7,6 +7,7 @@ export class Player implements PlayerModel {
   persona: Persona = {};
   role: Roles | null = null;
   guarded: boolean = false;
+  checked: boolean = false; // Detective checked this player
   seat: number | null = null;
   name: string | null = null; // Real name of the player
   alive: boolean = true;

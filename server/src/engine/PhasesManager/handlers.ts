@@ -154,13 +154,27 @@ export const phaseHandlers: Record<Phases, PhaseHandler> = {
     duration: config.TIMEOUTS_MS[Phases.ROUND_END],
     onEnter(game) {
       // Mafia kills a player
-      const votes = game._players.mafia.map((player) => player.vote);
-      const playerVotes = new Map<string, number>();
+      const votes = game._players.mafia.map((player) => player.vote).filter((id) => id !== null);
+      const playerVotes = new Map<string, number>(game._players.all.map((player) => [player.id, 0]));
+
       for (const playerId of votes) {
         if (playerId === null) continue;
         playerVotes.set(playerId, (playerVotes.get(playerId) || 0) + 1);
       }
-      // If there is a tie, mafia must vote again
+
+      // Get max votes
+      const maxVotes = Math.max(...playerVotes.values());
+      const maxVotedPlayers = [...playerVotes.entries()].filter(([, votes]) => votes === maxVotes).map(([id]) => id);
+
+      // If there are multiple max voted players, choose one randomly
+      const id = maxVotedPlayers.length > 1 ? Math.floor(Math.random() * maxVotedPlayers.length) : 0;
+
+      // Kill the player
+      const playerId = maxVotedPlayers[id];
+      const player = game._players.get(playerId);
+      if (!player) throw new InternalError("playerNotFound");
+      player.alive = false;
+      game._lastKilled = player.id;
     },
     transition(game, isTimeup) {
       if (isTimeup) {

@@ -4,7 +4,7 @@
   "main": "index.ts",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "test:engine": "tsx tests/engine.ts"
+    "test:engine": "tsx --env-file .env.tests tests/engine.ts"
   },
   "author": "",
   "license": "ISC",

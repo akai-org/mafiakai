@@ -12,7 +12,7 @@ export class Timer {
   constructor() {}
 
   start(milliseconds: number, callback: () => void) {
-    if (this.isRunning) return;
+    if (this.isRunning || milliseconds === 0) return;
     this.isRunning = true;
 
     this.started_at = Date.now();

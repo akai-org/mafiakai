@@ -32,6 +32,6 @@ export class PhasesManager {
     this.phaseHandlers[nextPhase].onEnter(game);
 
     const duration = this.phaseHandlers[nextPhase].duration;
-    if (duration !== null) game._timer.start(duration, () => this.update(game));
+    if (duration !== null && duration > 0) game._timer.start(duration, () => this.update(game));
   }
 }

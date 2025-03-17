@@ -1,18 +1,22 @@
 import { MASocket } from "@/types";
-import { manager } from "@/constants";
-import { Phases } from "@global/Game";
-import { Roles } from "@global/Roles";
+import { manager } from "@/constants/manager";
 
 // Here we set up the socket events for the client
 export default function socketRoutes(socket: MASocket) {
   const room = manager.getRoom(socket.data.roomCode)!;
   const playerId = socket.data.playerId;
 
-  socket.emit("conn_info_data", {
-    playerId: socket.data.playerId,
-  });
+  // Join to game
 
-  socket.emit("phase_updated", room.phase);
+  socket.emit("conn_info_data", { playerId: socket.data.playerId });
+  room.game.join(playerId);
+
+  // Bind game state to client
+  room.game.onphasechange = (phase) => socket.emit("newPhase", phase);
+  room.game.onplayerschange = (toPlayerId, players) => {
+    if (playerId === toPlayerId) socket.emit("newPlayers", players);
+  };
+  room.game.onerror = (error) => socket.emit("newError", error);
 
   room.update();
 

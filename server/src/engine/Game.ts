@@ -1,13 +1,13 @@
-import { Phases } from "@global/Game";
 import { Roles } from "@global/Roles";
 import { PlayerModel } from "@global/PlayerModel";
 import { PayloadError } from "@global/PayloadErrors";
+import { Phases } from "@global/Phases";
 import { InternalError } from "./InternalError";
 import { PlayersManager } from "./PlayersManager/PlayersManager";
 import { PhasesManager } from "./PhasesManager/PhasesManager";
 import { Timer } from "./PhasesManager/Timer";
 
-export class Game {
+export default class Game {
   // "Private"
   _timer = new Timer(); // 5 seconds
   _players = new PlayersManager();
@@ -23,6 +23,10 @@ export class Game {
   // Functions to make actions in the game
   // #####################################
 
+  update() {
+    this._phase.update(this);
+  }
+
   join(playerId: string) {
     let player = this._players.get(playerId);
 
@@ -37,7 +41,6 @@ export class Game {
     }
 
     this._players.add(playerId);
-    this._phase.update(this);
   }
 
   leave(playerId: string) {
@@ -46,8 +49,6 @@ export class Game {
 
     player.online = false;
     if (this._phase.current === Phases.LOBBY) this._players.remove(playerId);
-
-    this._phase.update(this);
   }
 
   ready(playerId: string, value: boolean) {
@@ -57,17 +58,15 @@ export class Game {
 
     // TODO: ??? any other checks ???
     player.isReady = value;
-    this._phase.update(this);
   }
 
   vote(playerId: string, target: string) {
     const player = this._players.get(playerId);
     if (!player) throw new PayloadError("playerNotFound");
-    if (!player.role) throw new InternalError("playerHasNoRole");
     if (!player.alive) throw new PayloadError("playerIsDead");
 
-    const citizenPass = this._phase.current == Phases.VOTING && player.role !== Roles.MAFIOSO;
-    const mafiaPass = this._phase.current == Phases.VOTING && player.role === Roles.MAFIOSO;
+    const citizenPass = this._phase.current === Phases.VOTING;
+    const mafiaPass = this._phase.current === Phases.MAFIA_VOTING && player.role === Roles.MAFIOSO;
     if (!(citizenPass || mafiaPass)) throw new PayloadError("youCannotVoteNow");
 
     const targetPlayer = this._players.get(target);
@@ -76,7 +75,6 @@ export class Game {
 
     // TODO: ??? any other checks ???
     player.vote = target;
-    this._phase.update(this);
   }
 
   // ########################### //

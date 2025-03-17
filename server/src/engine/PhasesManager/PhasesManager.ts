@@ -1,5 +1,5 @@
-import { Phases } from "@global/Game";
-import { Game } from "../Game";
+import { Phases } from "@global/Phases";
+import Game from "../Game";
 import { phaseHandlers } from "./handlers";
 
 export type PhaseHandler = {

@@ -1,9 +1,9 @@
-import { Game } from "@/engine/Game";
-import { Phases } from "@global/Game";
+import Game from "@/engine/Game";
+import { Phases } from "@global/Phases";
 import { ok, strictEqual } from "node:assert";
 import { describe, it } from "node:test";
 
-describe("Game engine", async () => {
+describe("Game engine - basics", async () => {
   let game: Game;
 
   await it("should be able to create a new game", () => {
@@ -38,7 +38,7 @@ describe("Game engine", async () => {
     ok(game._players.get("player2")?.isReady);
   });
 
-  await it("should be able to move to next phase", () => {
+  await it("should be able to move to next phase if conditions are met", () => {
     game.join("player1");
     game.join("player3");
     game.join("player4");
@@ -49,6 +49,7 @@ describe("Game engine", async () => {
     game.ready("player3", true);
     strictEqual(game._phase.current, Phases.LOBBY);
     game.ready("player4", true);
+    game.update();
     strictEqual(game._phase.current, Phases.ROLE_ASSIGNMENT);
   });
 });

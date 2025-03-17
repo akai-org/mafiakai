@@ -1,4 +1,4 @@
-import { Phases } from "./Game";
+import { Phases } from "./Phases";
 import { PayloadError } from "./PayloadErrors";
 import { PlayerModel } from "./PlayerModel";
 

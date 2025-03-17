@@ -1,7 +1,7 @@
 import { ExtendedError } from "socket.io";
 import { MASocket } from "@/types";
 import { manager } from "@/constants";
-import { Phases } from "@global/Game";
+import { Phases } from "@global/Phases";
 
 /*
  Validate connection and Join player to room

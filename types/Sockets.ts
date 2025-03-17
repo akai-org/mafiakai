@@ -1,4 +1,5 @@
-import type { Phases } from "./Game";
+import type { Phases } from "./Phases";
+import { PayloadError } from "./PayloadErrors";
 import { PlayerModel } from "./PlayerModel";
 import { Roles } from "./Roles";
 
@@ -14,6 +15,13 @@ export interface Server2ClientEvents {
   send_voting_result: (is_decisive: boolean, player: PlayerModel | null) => void;
   end_game: (winner: Roles.MAFIOSO | Roles.REGULAR_CITIZEN) => void;
   night_summary: (died: PlayerModel | null, saved: PlayerModel | null) => void;
+
+  // GameModel
+  newPhase: (phase: Phases) => void;
+  newTimer: (start_at: number, end_at: number) => void;
+  newLastKilled: (player_id: string | null) => void;
+  newPlayers: (players: PlayerModel[]) => void;
+  newError: (error: PayloadError | null) => void;
 }
 
 export type ConnectionInfoData = { playerId: string };

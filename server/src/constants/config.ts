@@ -1,4 +1,4 @@
-import { Phases } from "@global/Game";
+import { Phases } from "@global/Phases";
 
 // export default {
 //   PORT: parseInt(process.env.PORT || "5000"),

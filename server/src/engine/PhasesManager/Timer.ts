@@ -1,4 +1,4 @@
-import { InternalError } from "@/engine/InternalError";
+import { InternalError } from "../InternalError";
 
 export class Timer {
   public isRunning = false;

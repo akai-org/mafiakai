@@ -3,7 +3,6 @@ import { PhaseHandler } from "./PhasesManager";
 import { config } from "@/constants";
 import { InternalError } from "../InternalError";
 import { Roles } from "@global/Roles";
-import { Player } from "../PlayersManager/Player";
 import Game from "../Game";
 
 export const phaseHandlers: Record<Phases, PhaseHandler> = {

@@ -2,7 +2,6 @@ import { Roles } from "@global/Roles";
 import { PlayerModel } from "@global/PlayerModel";
 import { PayloadError } from "@global/PayloadErrors";
 import { Phases } from "@global/Phases";
-import { InternalError } from "./InternalError";
 import { PlayersManager } from "./PlayersManager/PlayersManager";
 import { PhasesManager } from "./PhasesManager/PhasesManager";
 import { Timer } from "./PhasesManager/Timer";

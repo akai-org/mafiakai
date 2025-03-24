@@ -1,6 +1,6 @@
 import { ExtendedError } from "socket.io";
 import { MASocket } from "@/types";
-import { manager } from "@/constants";
+import { manager } from "@/constants/manager";
 import { Phases } from "@global/Phases";
 
 /*
@@ -19,10 +19,12 @@ export default function socketAuth(socket: MASocket, next: (err?: ExtendedError)
   const room = manager.getRoom(code);
   if (room === undefined) return next(new Error(`Room ${code} does not exist`));
 
+  const game = room.game;
+
   const playerId = socket.handshake.auth.playerId;
 
   // Join as old player
-  if (room.hasPlayer(playerId)) {
+  if (game._players.has(playerId)) {
     socket.data = { playerId, roomCode: code };
     socket.join(playerId); // Assign player to their own private room
     socket.join(room.code); // Assign player to socket room
@@ -30,9 +32,9 @@ export default function socketAuth(socket: MASocket, next: (err?: ExtendedError)
   }
 
   // Join as new player
-  if (room.phase === Phases.LOBBY) {
+  if (game._phase.current === Phases.LOBBY) {
     const newPlayerId = manager.generatePlayerId();
-    room.addPlayer(newPlayerId);
+    game.join(newPlayerId);
 
     socket.data = { playerId: newPlayerId, roomCode: code };
     socket.join(playerId); // Assign player to their own private room

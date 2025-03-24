@@ -108,7 +108,7 @@ export class PlayersManager {
   }
 }
 
-// Fisher-Yates Sorting Algorithm, pseudorandom only
+// Fisher-Yates shuffle algorithm, pseudorandom only
 function shuffle(array: any[]): Array<any> {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));

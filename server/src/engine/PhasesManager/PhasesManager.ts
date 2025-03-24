@@ -24,7 +24,7 @@ export class PhasesManager {
   }
 
   update(game: Game): void {
-    const nextPhase = this.phaseHandlers[this._phase].transition(game, !game._timer.isRunning);
+    const nextPhase = this.phaseHandlers[this._phase].transition(game, !game._timer.running);
     if (nextPhase === null) return;
 
     this._phase = nextPhase;

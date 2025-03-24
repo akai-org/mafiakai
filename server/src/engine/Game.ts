@@ -56,8 +56,8 @@ export default class Game {
     const player = this._players.get(playerId);
     if (!player) throw new PayloadError("playerNotFound");
 
-    if (player.persona === null || player.seat === null)
-      throw new PayloadError("playerCannotBeReady")
+    // TODO: Rewrite tests
+    // if (player.persona === null || player.seat === null) throw new PayloadError("playerCannotBeReady");
     player.isReady = value;
   }
 

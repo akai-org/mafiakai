@@ -73,7 +73,6 @@ export default class Game {
     if (!targetPlayer) throw new PayloadError("targetNotFound");
     if (!targetPlayer.alive) throw new PayloadError("targetIsDead");
 
-    // TODO: ??? any other checks ???
     player.vote = target;
   }
 

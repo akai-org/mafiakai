@@ -1,6 +1,6 @@
 import { Phases } from "./Phases";
 import { PayloadError } from "./PayloadErrors";
-import { PlayerModel } from "./PlayerModel";
+import type { PlayerModel } from "./PlayerModel";
 
 export interface GameModel {
   phase: Phases;

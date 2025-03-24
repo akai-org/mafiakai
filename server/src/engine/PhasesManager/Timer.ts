@@ -3,8 +3,6 @@ import { InternalError } from "../InternalError";
 export class Timer {
   public isRunning = false;
 
-  private started_at: number | null = null;
-  private ended_at: number | null = null;
 
   private timeout_id: NodeJS.Timeout | null = null;
   private callback: (() => void) | null = null;

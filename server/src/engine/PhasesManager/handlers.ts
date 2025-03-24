@@ -95,18 +95,14 @@ export const phaseHandlers: Record<Phases, PhaseHandler> = {
       const maxVotedPlayers = [...playerVotes.entries()].filter(([, votes]) => votes === maxVotes).map(([id]) => id);
 
       // Get max voted player
-      let player: Player | null = null;
       if (maxVotedPlayers.length === 1) {
         const p = game._players.get(maxVotedPlayers[0]);
         if (!p) throw new InternalError("playerNotFound");
-        player = p;
-      }
-
-      // Reveal and kill player
-      if (player) {
-        player.alive = false;
-        player.revealed = true;
-        game._lastKilled = player.id;
+        
+        // Reveal and kill player
+        p.alive = false;
+        p.revealed = true;
+        game._lastKilled = p.id;
       }
     },
     transition(game, isTimeup) {

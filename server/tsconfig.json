@@ -7,14 +7,27 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@global/*": ["../types/*"],
-      "@local/*": ["./types/*"]
+      "@/*": [
+        "src/*"
+      ],
+      "@global/*": [
+        "../types/*"
+      ],
+      "@local/*": [
+        "./types/*"
+      ]
     }
   },
-  "include": ["types/*", "src/**/*", "index.ts", "../types/*"],
-  "exclude": ["node_modules"]
+  "include": [
+    "types/*",
+    "src/**/*",
+    "index.ts",
+    "../types/*",
+    "tests/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

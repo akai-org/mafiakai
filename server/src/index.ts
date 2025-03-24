@@ -1,24 +1,14 @@
-import express from "express";
-import http from "http";
-import { Server } from "socket.io";
-
-import { MAServer } from "@/types";
 import { config } from "@/constants";
 import { socketAuth } from "@/middlewares";
-import { socketRoutes, webRouter } from "@/routes";
+import { socketRoutes, socketsServer, webRouter, httpServer } from "@/routes";
+import { app } from "./app";
 
-const app = express(); // Create an Express application
-
-// Create servers
-const httpServer = http.createServer(app); // Create an HTTP server
-
-// Create a WebSocket server
-const socketsServer: MAServer = new Server(httpServer, {
-  cors: {
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"],
-  },
-});
+// if (process.env.NODE_ENV != "production" ){
+//   app.use((req, _, next) => {
+//     console.log(req);
+//     next();
+//   });
+// }
 
 // Configure servers
 socketsServer.use(socketAuth).on("connection", socketRoutes); // Configure the WebSocket server

@@ -1,20 +1,14 @@
 export enum Phases {
   /**
-   * Faza LOBBY: Gracze dołączają do gry. Gra czeka, aż wszyscy gracze zgłoszą gotowość.
+   * Faza LOBBY:
+   * - Gracze dołączają do gry.
+   * - Gracze wybierają swoje pozycje (np. miejsca przy stole).
+   * - Gracze wybierają swoje jawne postacie.
+   *
+   * Jedyna faza gry, w której mogą dołączyć nowi gracze.
+   * Gra czeka, aż wszyscy gracze zgłoszą gotowość, po czym przechodzi do ROLE_ASSIGNMENT.
    */
   LOBBY = "LOBBY",
-
-  /**
-   * Faza POSITION_SELECTION: Gracze wybierają swoje pozycje (np. miejsca przy stole).
-   * Jeśli wszyscy gracze są gotowi, gra przechodzi do CHARACTER_SELECTION.
-   */
-  POSITION_SELECTION = "POSITION_SELECTION",
-
-  /**
-   * Faza CHARACTER_SELECTION: Gracze wybierają swoje jawne postacie.
-   * Jeśli wszyscy gracze są gotowi, gra przechodzi do ROLE_ASSIGNMENT.
-   */
-  CHARACTER_SELECTION = "CHARACTER_SELECTION",
 
   /**
    * Faza ROLE_ASSIGNMENT: Gracze otrzymują swoje tajne role (np. obywatel, mafia).
@@ -24,39 +18,31 @@ export enum Phases {
 
   /**
    * Faza WELCOME: Krótkie wprowadzenie do gry. Gracze mogą zapoznać się z zasadami.
-   * Po określonym czasie gra automatycznie przechodzi do ROUND_START.
+   * Oficjalne rozpoczęcie rundy. Trwa przez krótki czas, zanim gra przejdzie do DAY.
+   * Po określonym czasie gra automatycznie przechodzi do DAY.
    */
   WELCOME = "WELCOME",
 
   /**
-   * Faza ROUND_START: Oficjalne rozpoczęcie rundy. Trwa przez krótki czas, zanim gra przejdzie do DAY.
-   */
-  ROUND_START = "ROUND_START",
-
-  /**
-   * Faza DAY: Początek dnia w grze. Gracze mogą rozmawiać i analizować wydarzenia.
-   * Po określonym czasie gra przechodzi do DEBATE.
-   */
-  DAY = "DAY",
-
-  /**
-   * Faza DEBATE: Gracze prowadzą debatę na temat swoich podejrzeń.
+   * Faza DEBATE:
+   * Początek dnia w grze. Gracze mogą rozmawiać i analizować wydarzenia.
+   * Gracze prowadzą debatę na temat swoich podejrzeń.
    * Po określonym czasie gra przechodzi do VOTING.
    */
   DEBATE = "DEBATE",
 
   /**
    * Faza VOTING: Gracze głosują na osobę, która ich zdaniem powinna zostać wyeliminowana.
-   * Jeśli dwie lub więcej osób otrzyma taką samą największą liczbę głosów, gra przechodzi do VOTING_OVERTIME.
+   * Jeśli dwie lub więcej osób otrzyma taką samą największą liczbę głosów, głosowanie rozpoczyna się ponownie.
    * W przeciwnym razie, gra przechodzi do NIGHT.
    */
   VOTING = "VOTING",
 
   /**
-   * Faza VOTING_OVERTIME: Dogrywka głosowania, gdy dwie lub więcej osób otrzymało największą liczbę głosów.
-   * Po rozstrzygnięciu gra przechodzi do NIGHT.
+   *  Faza ROLE_REVEAL: Odkrycie roli gracza, który wygrał głosowanie
+   *  Gra automatycznie przechodzi do NIGHT lub kończy się.
    */
-  VOTING_OVERTIME = "VOTING_OVERTIME",
+  ROLE_REVEAL = "ROLE_REVEAL",
 
   /**
    * Faza NIGHT: Gracze wykonują swoje nocne akcje.
@@ -94,12 +80,3 @@ export enum Phases {
    */
   GAME_END = "GAME_END",
 }
-
-/**
- * Fazy gry, do których mogą dołączyć nowi gracze.
- */
-export const NON_STRICT_PHASES: ReadonlyArray<Phases> = [
-  Phases.LOBBY,
-  Phases.POSITION_SELECTION,
-  Phases.CHARACTER_SELECTION,
-];

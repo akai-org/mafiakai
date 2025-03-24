@@ -1,7 +1,7 @@
 import { ExtendedError } from "socket.io";
 import { MASocket } from "@/types";
 import { manager } from "@/constants";
-import { NON_STRICT_PHASES } from "@global/Game";
+import { Phases } from "@global/Phases";
 
 /*
  Validate connection and Join player to room
@@ -12,7 +12,7 @@ import { NON_STRICT_PHASES } from "@global/Game";
 export default function socketAuth(socket: MASocket, next: (err?: ExtendedError) => void) {
   // Code
   const code = socket.handshake.query.roomCode;
-  if (code === undefined) return next(new Error("Invalud code provided"));
+  if (code === undefined) return next(new Error("Invalid code provided"));
   if (typeof code !== "string") return next(new Error("Invalid code provided"));
 
   // Room
@@ -24,15 +24,19 @@ export default function socketAuth(socket: MASocket, next: (err?: ExtendedError)
   // Join as old player
   if (room.hasPlayer(playerId)) {
     socket.data = { playerId, roomCode: code };
+    socket.join(playerId); // Assign player to their own private room
+    socket.join(room.code); // Assign player to socket room
     return next();
   }
 
   // Join as new player
-  if (NON_STRICT_PHASES.includes(room.phase)) {
+  if (room.phase === Phases.LOBBY) {
     const newPlayerId = manager.generatePlayerId();
     room.addPlayer(newPlayerId);
 
     socket.data = { playerId: newPlayerId, roomCode: code };
+    socket.join(playerId); // Assign player to their own private room
+    socket.join(room.code); // Assign player to socket room
     return next();
   }
 

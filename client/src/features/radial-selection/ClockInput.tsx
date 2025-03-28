@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 // useEffect deps are fine, the linter is wrong
 
-import useCircleCapture from "@/hooks/useCircleCapture";
-import useKeyDown from "@/hooks/useKeyDown";
-import { mod } from "@/utils/mod";
+import { useCircleCapture } from "@/hooks";
+import { useKeyDown } from "@/hooks";
+import { mod } from "@/utils";
 import clsx from "clsx";
 import { useEffect, useMemo, useState } from "react";
 

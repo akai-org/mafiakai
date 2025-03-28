@@ -1,7 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import { ConnContext } from "@/features/connection";
-import { Phases } from "@global/Game";
+import { Phases } from "@global/Phases";
 import Lobby from "@/pages/Lobby";
+import Debate from "../debate";
+import Layout from "../Layout";
 
 function Game() {
   const { socket } = useContext(ConnContext);
@@ -20,8 +22,12 @@ function Game() {
     case Phases.LOBBY:
       return <Lobby />;
 
-    default:
-      return <div>Placeholder for phase {phase}</div>;
+    default: //temp
+      return (
+        <Layout>
+          <Debate />
+        </Layout>
+      );
   }
 }
 

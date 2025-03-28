@@ -1,4 +1,4 @@
-import useCircleCapture from "@/hooks/useCircleCapture";
+import { useCircleCapture } from "@/hooks";
 
 /**
  * @deprecated

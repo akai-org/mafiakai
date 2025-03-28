@@ -1,4 +1,4 @@
-import { mod } from "@/utils/mod";
+import { mod } from "@/utils";
 import type { Seat } from ".";
 
 export default function Paragraph(props: { seats: Seat[]; arrow: number; yourSeat: number | null }) {

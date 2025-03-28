@@ -1,9 +1,9 @@
-import useSwipe from "@/hooks/useSwipe";
+import { useSwipe } from "@/hooks";
 import { useCallback, useState } from "react";
 import Character from "./Character";
 import Seat from "./Seats";
 import Waiting from "./Waiting";
-import useKeyDown from "@/hooks/useKeyDown";
+import { useKeyDown } from "@/hooks";
 import { Button, Input, Modal } from "@/components";
 import { socket } from "@/constants";
 

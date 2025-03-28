@@ -1,4 +1,6 @@
-import Game from "./Game";
-import Menu from "./Menu";
+import Game from "./game";
+import Menu from "./menu";
+import Profile from "./profile";
+import Layout from "./Layout";
 
-export { Game as GameScreen, Menu as MenuScreen };
+export { Game as GameScreen, Menu as MenuScreen, Profile, Layout };

@@ -1,0 +1,28 @@
+services:
+  backend:
+    build:
+      context: ./
+      target: production-backend
+    # image: ...
+    env_file: .env
+    ports:
+      - 5000:5000
+    networks:
+      - mafiakai
+
+  frontend:
+    build:
+      context: ./
+      target: production-frontend
+    # image: ...
+    ports:
+      - 5173:80
+    depends_on:
+      backend:
+        condition: service_started
+        restart: true
+    networks:
+      - mafiakai
+
+networks:
+  mafiakai:

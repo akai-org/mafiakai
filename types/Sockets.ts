@@ -1,6 +1,6 @@
 import type { Phases } from "./Phases";
 import { PayloadError } from "./PayloadErrors";
-import { PlayerModel } from "./PlayerModel";
+import type { PlayerModel } from "./PlayerModel";
 import { Roles } from "./Roles";
 
 type timestamp = number;

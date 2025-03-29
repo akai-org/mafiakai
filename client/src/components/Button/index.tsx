@@ -28,8 +28,6 @@ function Button({
       disabled={disabled}
       aria-disabled={disabled}
       type="button"
-      disabled={disabled}
-      aria-disabled={disabled}
       {...rest}
     >
       {children}

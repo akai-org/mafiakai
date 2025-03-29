@@ -11,7 +11,7 @@
 
 import { PlayerModel } from "@global/PlayerModel";
 import { Roles } from "@global/Roles";
-import { Game } from "../Game";
+import Game from "../Game";
 import { Player } from "../PlayersManager/Player";
 import { InternalError } from "../InternalError";
 

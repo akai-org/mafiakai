@@ -8,6 +8,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
+    "outDir": "dist",
     "paths": {
       "@/*": [
         "src/*"

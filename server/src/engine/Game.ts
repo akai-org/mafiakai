@@ -76,6 +76,21 @@ export default class Game {
     player.vote = target;
   }
 
+  name(playerId: string, name: string){
+    const player = this._players.get(playerId);
+    if (!player) throw new PayloadError("playerNotFound");
+
+     if (!(this._phase.current === Phases.LOBBY)) {
+      throw new PayloadError("gameAlreadyStarted")
+     }
+    
+    player.name = name;
+  }
+
+  seatAt(a:string,b:number){
+    // TODO
+  }
+
   // ########################### //
   // Function to collect data    //
   // ########################### //

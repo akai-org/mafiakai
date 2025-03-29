@@ -4,7 +4,7 @@ import { Phases } from "@global/Phases";
 import { doesNotThrow, ok, strictEqual, throws } from "node:assert";
 import { describe, it } from "node:test";
 
-describe("Game engine - players", async () => {
+export const playersEngineTest = describe("Game engine - players", async () => {
   it("should be able to create a new game", () => {
     const game: Game = new Game();
   });

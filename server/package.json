@@ -4,6 +4,7 @@
   "main": "index.ts",
   "scripts": {
     "dev": "tsx watch src/index.ts",
+    "test": "npm run test:engine_base && npm run test:engine_players && npm run test:engine_voting",
     "test:engine_base": "tsx --env-file .env.tests tests/engine_base.ts",
     "test:engine_players": "tsx --env-file .env.tests tests/engine_players.ts",
     "test:engine_voting": "tsx --env-file .env.tests tests/engine_voting.ts"

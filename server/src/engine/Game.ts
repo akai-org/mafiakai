@@ -5,6 +5,7 @@ import { Phases } from "@global/Phases";
 import { PlayersManager } from "./PlayersManager/PlayersManager";
 import { PhasesManager } from "./PhasesManager/PhasesManager";
 import { Timer } from "./PhasesManager/Timer";
+import { Persona } from "@global/Persona";
 
 export default class Game {
   // "Private"
@@ -55,8 +56,7 @@ export default class Game {
     const player = this._players.get(playerId);
     if (!player) throw new PayloadError("playerNotFound");
 
-    // TODO: Rewrite tests
-    // if (player.persona === null || player.seat === null) throw new PayloadError("playerCannotBeReady");
+    if (player.persona === null || player.seat === null) throw new PayloadError("playerCannotBeReady");
     player.isReady = value;
   }
 
@@ -74,6 +74,23 @@ export default class Game {
     if (!targetPlayer.alive) throw new PayloadError("targetIsDead");
 
     player.vote = target;
+  }
+
+
+  seatAt(playerId: string, seat: number) {
+    if (this._phase.current !== Phases.LOBBY) throw new PayloadError("gameAlreadyStarted");
+    const player = this._players.get(playerId);
+    if (!player) throw new PayloadError("playerNotFound");
+
+    this._players.seatAt(playerId,seat)
+  }
+
+  describePlayer(playerId: string, persona: Persona){
+    if (this._phase.current !== Phases.LOBBY) throw new PayloadError("gameAlreadyStarted");
+    const player = this._players.get(playerId);
+    if (!player) throw new PayloadError("playerNotFound");
+
+    player.persona = persona;
   }
 
   // ########################### //

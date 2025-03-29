@@ -45,17 +45,19 @@ export class PlayersManager {
   }
 
   // Seat management
+  seatAt(playerId: string, seat: number){
+    const player = this.players.get(playerId)
+    if (player === undefined) return false;
 
-  setSeatFor(playerId: string, seat: number) {
-    for (const player of this.all) {
-      if (player.seat && player.seat >= seat) player.seat++;
+    const seated = this.all.filter((a)=>!(a.seat === null))
+    let i = Math.max(Math.min(seat,seated.length),0);
+    for (let j of seated){
+      if (j.seat! >= i){
+        j.seat!++;
+      }
     }
-
-    this.players.get(playerId)!.seat = seat;
-  }
-
-  get allBySeats() {
-    return this.all.filter((player) => player.seat).sort((a, b) => a.seat! - b.seat!);
+    player.seat = i;
+    return true;
   }
 
   // Role management

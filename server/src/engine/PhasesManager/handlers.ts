@@ -3,7 +3,6 @@ import { PhaseHandler } from "./PhasesManager";
 import { config } from "@/constants";
 import { InternalError } from "../InternalError";
 import { Roles } from "@global/Roles";
-import { Player } from "../PlayersManager/Player";
 import Game from "../Game";
 
 export const phaseHandlers: Record<Phases, PhaseHandler> = {
@@ -72,9 +71,9 @@ export const phaseHandlers: Record<Phases, PhaseHandler> = {
   [Phases.VOTING]: {
     duration: config.TIMEOUTS_MS[Phases.VOTING],
     onEnter(game) {},
-    transition(game, isTimeup) {
+    transition(game) {
       const allVoted = game._players.all.every((player) => player.vote !== null);
-      if (isTimeup || allVoted) return Phases.ROLE_REVEAL;
+      if (allVoted) return Phases.ROLE_REVEAL;
       return null;
     },
   },

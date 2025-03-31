@@ -4,10 +4,13 @@
   "main": "index.ts",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "test:engine_base": "tsx --env-file .env.tests tests/engine_base.ts",
-    "test:engine_players": "tsx --env-file .env.tests tests/engine_players.ts",
-    "test:engine_voting": "tsx --env-file .env.tests tests/engine_voting.ts"
+    "test": "tsx --test --env-file .env.tests tests",
+    "test:file": "tsx --test --env-file .env.tests"
   },
+  "//": [
+    "Example command to run a specific test file ",
+    "npm run test:file -- tests/engine/base.ts"
+  ],
   "author": "",
   "license": "ISC",
   "description": "",

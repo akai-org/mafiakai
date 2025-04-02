@@ -58,6 +58,15 @@ export class PlayersManager {
     return this.all.filter((player) => player.seat).sort((a, b) => a.seat! - b.seat!);
   }
 
+  // Name management
+
+  setNameFor(playerId: string, name: string) {
+    const player = this.get(playerId);
+    if (!player) throw new InternalError("playerNotFound");
+
+    player.name = name;
+  }
+
   // Role management
 
   establish_roles(): boolean {

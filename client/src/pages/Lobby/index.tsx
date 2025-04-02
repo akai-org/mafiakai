@@ -1,11 +1,12 @@
 import useSwipe from "@/hooks/useSwipe";
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import Character from "./Character";
 import Seat from "./Seats";
 import Waiting from "./Waiting";
 import useKeyDown from "@/hooks/useKeyDown";
 import { Button, Input, Modal } from "@/components";
 import { socket } from "@/constants";
+import { ApiContext } from "@/features/api/GameContext";
 
 enum Panels {
   Character = "Character",
@@ -55,13 +56,15 @@ function Lobby() {
     });
   };
 
+  const { state, actions } = useContext(ApiContext);
+
   const [playerName, setPlayerName] = useState<string>("");
   const [isModalOpened, setIsModalOpened] = useState(true);
   const playerNameLength = playerName?.trim().length;
 
   const handleNameConfirmation = () => {
     if (playerNameLength > 1) {
-      socket.emit("send_player_name", playerName);
+      actions.setPlayerName(playerName);
       setIsModalOpened(false);
     }
   };

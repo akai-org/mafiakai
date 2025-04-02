@@ -1,87 +1,25 @@
-import { MASocket } from "@/types";
 import { manager } from "@/constants/manager";
+import { MASocket } from "@/types";
 
 // Here we set up the socket events for the client
 export default function socketRoutes(socket: MASocket) {
   const room = manager.getRoom(socket.data.roomCode)!;
   const playerId = socket.data.playerId;
+  console.log(`Player ${playerId} joined room ${room.code}`);
 
-  // Join to game
+  room.game.join(playerId); // Join the game
+  socket.join(room.code); // Join socket.io room
+  socket.join(playerId); // Join socket.io room for the player
 
-  socket.emit("conn_info_data", { playerId: socket.data.playerId });
-  room.game.join(playerId);
+  // Bind game events to socket events
+  socket.on("setReady", (readiness) => room.game.ready(socket.data.playerId, readiness));
+  socket.on("setSeat", (position: number) => room.game._players.setSeatFor(socket.data.playerId, position));
+  socket.on("setPlayerName", (name: string) => room.game._players.setNameFor(socket.data.playerId, name));
+  socket.on("vote", (targetId: string) => room.game.vote(socket.data.playerId, targetId));
 
-  // Bind game state to client
-  room.game.onphasechange = (phase) => socket.emit("newPhase", phase);
-  room.game.onplayerschange = (toPlayerId, players) => {
-    if (playerId === toPlayerId) socket.emit("newPlayers", players);
-  };
-  room.game.onerror = (error) => socket.emit("newError", error);
+  socket.on("disconnect", () => room.game.leave(playerId));
 
-  room.update();
-
-  socket.on("disconnect", () => {
-    // Potential race condition - need to lock changing phases / temporarily disable timeout
-    room?.disconnectPlayer(playerId);
-    room.update();
-  });
-
-  socket.on("set_ready", () => {
-    if (room.phase === Phases.LOBBY) {
-      // Potential race condition - need to lock changing phases / temporarily disable timeout
-      room.getPlayer(playerId)!.isReady = true;
-    } else {
-      // Invalid request
-      return;
-    }
-
-    room.update();
-  });
-
-  socket.on("send_player_name", (playerName) => {
-    if (room.phase === Phases.LOBBY) {
-      // Potential race condition - need to lock changing phases / temporarily disable timeout
-      room.getPlayer(playerId)!.name = playerName;
-    } else {
-      // Invalid request
-      return;
-    }
-    room.update();
-  });
-
-  socket.on("set_position", (position: number) => {
-    // Potential race condition - need to lock changing phases / temporarily disable timeout
-    room.setPlayerSeat(playerId, position);
-    room.update();
-  });
-
-  socket.on("vote", (player_id: string) => {
-    const vote = room.getPlayer(player_id);
-    if (vote === undefined) {
-      // Invalid request
-      return;
-    }
-
-    const this_player = room.getPlayer(playerId)!;
-
-    // Potential race condition - need to lock changing phases / temporarily disable timeout
-    if (room.phase === Phases.VOTING) {
-      // Potential race condition - need to lock updating room.game.common_vote
-      const prev = room.game.common_vote.get(vote.id) ?? 0;
-      room.game.common_vote.set(vote.id, prev + 1);
-    } else if (room.phase === Phases.MAFIA_VOTING && this_player.role === Roles.MAFIOSO) {
-      // Potential race condition - need to lock updating room.game.common_vote
-      const prev = room.game.mafia_vote.get(vote.id) ?? 0;
-      room.game.mafia_vote.set(vote.id, prev + 1);
-    } else if (room.phase === Phases.BODYGUARD_DEFENSE && this_player.role === Roles.BODYGUARD) {
-      room.game.chosen_by_bodyguard = vote.id;
-    } else if (room.phase === Phases.DETECTIVE_CHECK && this_player.role === Roles.DETECTIVE) {
-      room.game.chosen_by_detective = vote.id;
-    } else {
-      // Invalid request
-      return;
-    }
-
-    room.update();
-  });
+  setTimeout(() => {
+    room.game._state.updatePhase(room.game);
+  }, 1000);
 }

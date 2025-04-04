@@ -1,12 +1,11 @@
+import { Button, Input, Modal } from "@/components";
+import { ApiContext } from "@/features/api/GameContext";
+import useKeyDown from "@/hooks/useKeyDown";
 import useSwipe from "@/hooks/useSwipe";
 import { useCallback, useContext, useState } from "react";
 import Character from "./Character";
 import Seat from "./Seats";
 import Waiting from "./Waiting";
-import useKeyDown from "@/hooks/useKeyDown";
-import { Button, Input, Modal } from "@/components";
-import { socket } from "@/constants";
-import { ApiContext } from "@/features/api/GameContext";
 
 enum Panels {
   Character = "Character",

@@ -13,6 +13,7 @@ export default function APIProvider({ children }: { children: React.ReactNode })
   const updateError = (error: GameModel["error"]) => setState((prev) => ({ ...prev, error }));
   const updatePhase = (phase: GameModel["phase"]) => setState((prev) => ({ ...prev, phase }));
   const updatePlayers = (players: GameModel["players"]) => setState((prev) => ({ ...prev, players }));
+  const updateYourId = (you: GameModel["yourId"]) => setState((prev) => ({ ...prev, you }));
 
   const connection = useSocket((s) => {
     // Register listeners
@@ -21,6 +22,7 @@ export default function APIProvider({ children }: { children: React.ReactNode })
     s.on("newError", updateError);
     s.on("newPhase", updatePhase);
     s.on("newPlayers", updatePlayers);
+    s.on("sendPlayerId", updateYourId);
 
     setActions({
       setPlayerName: (name) => s.emit("setPlayerName", name),

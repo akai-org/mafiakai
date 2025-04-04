@@ -10,4 +10,6 @@ export interface GameModel {
 
   players: PlayerModel[];
   error: PayloadError | null;
+
+  yourId: string | null; // your id
 }

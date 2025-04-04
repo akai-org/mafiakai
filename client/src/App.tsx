@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router";
 
 import { GameScreen, MenuScreen } from "@/pages";
-import APIProvider from "./features/api/Provider";
+import APIProvider from "./features/api/GameContextProvider";
 
 function App() {
   return (

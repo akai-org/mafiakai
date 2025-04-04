@@ -55,7 +55,7 @@ function Lobby() {
     });
   };
 
-  const { state, actions } = useContext(ApiContext);
+  const { actions } = useContext(ApiContext);
 
   const [playerName, setPlayerName] = useState<string>("");
   const [isModalOpened, setIsModalOpened] = useState(true);

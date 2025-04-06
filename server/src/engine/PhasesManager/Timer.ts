@@ -1,10 +1,11 @@
 import { InternalError } from "../InternalError";
 
 export class Timer {
-  public isRunning = false;
+  private isRunning = false;
 
-  private started_at: number | null = null;
-  private ended_at: number | null = null;
+  get running() {
+    return this.isRunning;
+  }
 
   private timeout_id: NodeJS.Timeout | null = null;
   private callback: (() => void) | null = null;
@@ -15,9 +16,6 @@ export class Timer {
     if (this.isRunning || milliseconds === 0) return;
     this.isRunning = true;
 
-    this.started_at = Date.now();
-    this.ended_at = this.started_at + milliseconds;
-
     this.callback = callback;
     this.timeout_id = setTimeout(() => {
       this.isRunning = false;
@@ -26,10 +24,7 @@ export class Timer {
   }
 
   extend(milliseconds: number) {
-    if (this.isRunning === false || !this.timeout_id || !this.callback || !this.ended_at)
-      throw new InternalError("cannotExtendTimer");
-
-    this.ended_at += milliseconds;
+    if (this.isRunning === false || !this.timeout_id || !this.callback) throw new InternalError("cannotExtendTimer");
 
     clearTimeout(this.timeout_id);
     this.timeout_id = setTimeout(() => {
@@ -43,8 +38,6 @@ export class Timer {
       clearTimeout(this.timeout_id);
       this.timeout_id = null;
       this.callback = null;
-      this.started_at = null;
-      this.ended_at = null;
     }
 
     this.isRunning = false;

@@ -59,7 +59,7 @@ export default class Game {
     const player = this._players.get(playerId);
     if (!player) throw new PayloadError("playerNotFound");
 
-    // TODO: ??? any other checks ???
+    if (player.persona === null || player.seat === null) throw new PayloadError("playerCannotBeReady");
     player.isReady = value;
   }
 
@@ -76,8 +76,23 @@ export default class Game {
     if (!targetPlayer) throw new PayloadError("targetNotFound");
     if (!targetPlayer.alive) throw new PayloadError("targetIsDead");
 
-    // TODO: ??? any other checks ???
     player.vote = target;
+  }
+
+  seatAt(playerId: string, seat: number) {
+    if (this._phase.current !== Phases.LOBBY) throw new PayloadError("gameAlreadyStarted");
+    const player = this._players.get(playerId);
+    if (!player) throw new PayloadError("playerNotFound");
+
+    this._players.seatAt(playerId, seat);
+  }
+
+  describePlayer(playerId: string, persona: Persona) {
+    if (this._phase.current !== Phases.LOBBY) throw new PayloadError("gameAlreadyStarted");
+    const player = this._players.get(playerId);
+    if (!player) throw new PayloadError("playerNotFound");
+
+    player.persona = persona;
   }
 
   // ########################### //

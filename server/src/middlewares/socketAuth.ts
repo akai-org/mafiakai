@@ -18,6 +18,8 @@ export default function socketAuth(socket: MASocket, next: (err?: ExtendedError)
   const room = manager.getRoom(code);
   if (room === undefined) return next(new Error(`Room ${code} does not exist`));
 
+  const game = room.game;
+
   // Player Id
   let playerId = socket.handshake.auth.playerId;
   if (playerId === undefined) playerId = manager.generatePlayerId();

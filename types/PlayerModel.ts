@@ -4,7 +4,7 @@ import { Roles } from "./Roles";
 export interface PlayerModel {
   id: string;
 
-  role: Roles | null; // Only playerself and detective knows the role
+  role: Roles | null; // Only the player themself and the detective upon inspection know the role
   guarded: boolean; // Only bodyguard knows if player is guarded
   alive: boolean;
 

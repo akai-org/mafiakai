@@ -6,6 +6,7 @@ import { PhasesManager } from "./PhasesManager/PhasesManager";
 import { Timer } from "./PhasesManager/Timer";
 import { PlayersManager } from "./PlayersManager/PlayersManager";
 import { StateManager } from "./StateManager/StateManager";
+import { Persona } from "@global/Persona";
 
 export default class Game {
   // "Private"

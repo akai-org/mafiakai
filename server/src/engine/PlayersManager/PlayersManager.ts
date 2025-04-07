@@ -60,6 +60,15 @@ export class PlayersManager {
     return true;
   }
 
+  // Name management
+
+  setNameFor(playerId: string, name: string) {
+    const player = this.get(playerId);
+    if (!player) throw new InternalError("playerNotFound");
+
+    player.name = name;
+  }
+
   // Role management
 
   establish_roles(): boolean {

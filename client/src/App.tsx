@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router";
 
-import { ConnectionProvider } from "@/features/connection";
 import { GameScreen, MenuScreen } from "@/pages";
+import APIProvider from "./features/api/GameContextProvider";
 
 function App() {
   return (
@@ -12,9 +12,9 @@ function App() {
         <Route
           path="room/:code"
           element={
-            <ConnectionProvider>
+            <APIProvider>
               <GameScreen />
-            </ConnectionProvider>
+            </APIProvider>
           }
         />
       </Routes>

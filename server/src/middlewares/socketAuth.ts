@@ -1,7 +1,6 @@
-import { ExtendedError } from "socket.io";
-import { MASocket } from "@/types";
 import { manager } from "@/constants/manager";
-import { Phases } from "@global/Phases";
+import { MASocket } from "@/types";
+import { ExtendedError } from "socket.io";
 
 /*
  Validate connection and Join player to room
@@ -19,29 +18,10 @@ export default function socketAuth(socket: MASocket, next: (err?: ExtendedError)
   const room = manager.getRoom(code);
   if (room === undefined) return next(new Error(`Room ${code} does not exist`));
 
-  const game = room.game;
+  // Player Id
+  let playerId = socket.handshake.auth.playerId;
+  if (playerId === undefined) playerId = manager.generatePlayerId();
+  socket.data = { playerId: playerId, roomCode: code };
 
-  const playerId = socket.handshake.auth.playerId;
-
-  // Join as old player
-  if (game._players.has(playerId)) {
-    socket.data = { playerId, roomCode: code };
-    socket.join(playerId); // Assign player to their own private room
-    socket.join(room.code); // Assign player to socket room
-    return next();
-  }
-
-  // Join as new player
-  if (game._phase.current === Phases.LOBBY) {
-    const newPlayerId = manager.generatePlayerId();
-    game.join(newPlayerId);
-
-    socket.data = { playerId: newPlayerId, roomCode: code };
-    socket.join(playerId); // Assign player to their own private room
-    socket.join(room.code); // Assign player to socket room
-    return next();
-  }
-
-  // Can't join
-  return next(new Error(`Room ${code} does not accept new players currently`));
+  return next();
 }

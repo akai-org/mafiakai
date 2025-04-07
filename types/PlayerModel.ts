@@ -1,4 +1,4 @@
-import { Persona } from "./Persona";
+import type { Persona } from "./Persona";
 import { Roles } from "./Roles";
 
 export interface PlayerModel {

@@ -1,43 +1,42 @@
-import type { Phases } from "./Phases";
-import { PayloadError } from "./PayloadErrors";
-import { PlayerModel } from "./PlayerModel";
-import { Roles } from "./Roles";
-
-type timestamp = number;
+import type { GameModel } from "./GameModel";
+import type { Persona } from "./Persona";
 
 export interface Server2ClientEvents {
-  rooms_data: (rooms: Array<String>) => void;
-  conn_info_data: (data: ConnectionInfoData) => void;
-  phase_updated: (phase: Phases) => void;
-  planned_phase_change: (phase: Phases, when: timestamp) => void; // Notifies about upcoming changes to phases with a numeric unix timestamp in milliseconds (Date.now())
-  set_player_role: (role: Roles) => void;
-  send_detective_check: (player: PlayerModel | null) => void;
-  send_voting_result: (is_decisive: boolean, player: PlayerModel | null) => void;
-  end_game: (winner: Roles.MAFIOSO | Roles.REGULAR_CITIZEN) => void;
-  night_summary: (died: PlayerModel | null, saved: PlayerModel | null) => void;
+  // Connection
+  sendPlayerId: (playerId: string) => void;
 
   // GameModel
-  newPhase: (phase: Phases) => void;
-  newTimer: (start_at: number, end_at: number) => void;
-  newLastKilled: (player_id: string | null) => void;
-  newPlayers: (players: PlayerModel[]) => void;
-  newError: (error: PayloadError | null) => void;
+  newPhase: (phase: GameModel["phase"]) => void;
+  newTimer: (timer: GameModel["timer"]) => void;
+  newLastKilled: (playerId: GameModel["lastKilled"]) => void;
+  newPlayers: (players: GameModel["players"]) => void;
+  newError: (error: GameModel["error"]) => void;
 }
 
-export type ConnectionInfoData = { playerId: string };
+export type ConnectionInfoData = { [PLAYER_ID_KEY_NAME]: string };
 
 export interface Client2ServerEvents {
-  set_position: (position: number) => void;
-  send_player_name: (playerName: string) => void;
-  set_ready: () => void;
-  vote: (player_id: string) => void;
+  // Lobby management
+  setPlayerName(playerName: string): void;
+  setSeat(seatNumber: number): void;
+  updatePersona(persona: Partial<Persona>): void;
+
+  // Game management
+  setReady(readiness: boolean): void;
+  vote(playerName: string): void;
+
+  check(playerName: string): void; // Detective check
+  protect(playerName: string): void; // Bodyguard protect
 }
 
 export interface InterServerEvents {
   ping: () => void;
 }
 
+export const PLAYER_ID_KEY_NAME = "playerId";
+export const ROOM_CODE_KEY_NAME = "roomCode";
+
 export interface SocketData {
-  playerId: string;
-  roomCode: string;
+  [PLAYER_ID_KEY_NAME]: string;
+  [ROOM_CODE_KEY_NAME]: string;
 }

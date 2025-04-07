@@ -1,5 +1,6 @@
 import express from "express";
-import { manager } from "@/constants";
+import { manager } from "@/constants/manager";
+import { socketsServer } from "./socketServer";
 
 const webRouter = express.Router();
 
@@ -8,8 +9,8 @@ webRouter.get("/", (req, res) => {
 });
 
 webRouter.get("/create", (req, res) => {
-  const roomCode = manager.create();
-  res.json({ code: roomCode });
+  const room = manager.create();
+  res.json({ code: room.code });
 });
 
 webRouter.get("/room/:code", (req, res) => {
@@ -20,7 +21,11 @@ webRouter.get("/room/:code", (req, res) => {
     return;
   }
 
-  res.json({ roomCode: room.code, playersInRoom: room.getPlayers().length });
+  res.json({
+    roomCode: room.code,
+    playersInRoom: room.game._players.all.length,
+    players: room.game._players.all.map((p) => p.name),
+  });
 });
 
 export default webRouter;

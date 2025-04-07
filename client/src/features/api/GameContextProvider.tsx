@@ -1,7 +1,8 @@
 import type { GameModel } from "@global/GameModel";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { ApiContext, initialState } from "./GameContext";
 import useSocket from "./useSocket";
+import type { CustomSocket } from "@/types/Socket";
 
 export default function APIProvider({ children }: { children: React.ReactNode }) {
   // const [buffor, setBuffor] = useState<GameModel>(initialState.state); Maybe some day
@@ -15,7 +16,7 @@ export default function APIProvider({ children }: { children: React.ReactNode })
   const updatePlayers = (players: GameModel["players"]) => setState((prev) => ({ ...prev, players }));
   const updateYourId = (you: GameModel["yourId"]) => setState((prev) => ({ ...prev, you }));
 
-  const connection = useSocket((s) => {
+  const gameStateHandler = useCallback((s: CustomSocket) => {
     // Register listeners
     s.on("newTimer", updateTimer);
     s.on("newLastKilled", updateLastKilled);
@@ -46,7 +47,9 @@ export default function APIProvider({ children }: { children: React.ReactNode })
         vote: () => {},
       });
     };
-  });
+  }, []);
+
+  const connection = useSocket(gameStateHandler);
 
   return (
     <ApiContext.Provider

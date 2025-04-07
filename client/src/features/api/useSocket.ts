@@ -25,7 +25,7 @@ function disconnect() {
  * This hook is used to manage the socket connection and its status
  */
 type SocketStatus = "preparing" | "connected" | "reconnecting" | "error";
-export default function useSocket(connectionCallback: (socket: CustomSocket) => () => void) {
+export default function useSocket(initializeSocketHandlers: (socket: CustomSocket) => () => void) {
   // Get the room code from the URL params
   const { code } = useParams<{ code: string }>();
   if (!code) throw new Error("Room code is not defined");
@@ -34,43 +34,45 @@ export default function useSocket(connectionCallback: (socket: CustomSocket) => 
     socket.io.opts.query = { [ROOM_CODE_KEY_NAME]: code };
   }, [code]);
 
-  // Set up the socket connection
-  const [onDisconnect, setOnDisconnect] = useState<() => void>(() => {});
+  // Set up data listeners
+  useEffect(() => {
+    const cleanup = initializeSocketHandlers(socket);
+
+    return () => {
+      cleanup();
+    };
+  }, [initializeSocketHandlers]);
+
+  // Set up the socket connection listeners
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [status, setStatus] = useState<SocketStatus>("preparing");
   const isConnected = useMemo(() => status === "connected", [status]);
 
-  const handleOnConnection = useCallback(() => {
+  const handleOnConnection = () => {
     setStatus("connected");
     setConnectionError(null);
-    setOnDisconnect(() => connectionCallback(socket));
-  }, [connectionCallback]);
+  };
 
-  const handleConnectionError = useCallback((err: Error) => {
+  const handleConnectionError = (err: Error) => {
     setConnectionError(err.message);
     setStatus("error");
-  }, []);
+  };
 
-  const handleOnDisconnect = useCallback(
-    (reason: string) => {
-      switch (reason) {
-        case "io server disconnect":
-          // the disconnection was initiated by the server, you need to reconnect manually
-          setStatus("error");
-          break;
-        case "io client disconnect":
-          // the disconnection was initiated by the client, you can ignore it
-          break;
-        default:
-          // else the socket will automatically try to reconnect
-          setStatus("reconnecting");
-          break;
-      }
-      onDisconnect();
-      setOnDisconnect(() => () => {});
-    },
-    [onDisconnect]
-  );
+  const handleOnDisconnect = useCallback((reason: string) => {
+    switch (reason) {
+      case "io server disconnect":
+        // the disconnection was initiated by the server, you need to reconnect manually
+        setStatus("error");
+        break;
+      case "io client disconnect":
+        // the disconnection was initiated by the client, you can ignore it
+        break;
+      default:
+        // else the socket will automatically try to reconnect
+        setStatus("reconnecting");
+        break;
+    }
+  }, []);
 
   useEffect(() => {
     socket.on("connect", handleOnConnection);
@@ -84,7 +86,7 @@ export default function useSocket(connectionCallback: (socket: CustomSocket) => 
       socket.off("disconnect", handleOnDisconnect);
       socket.off("connect_error", handleConnectionError);
     };
-  }, [handleConnectionError, handleOnDisconnect, handleOnConnection]);
+  }, [handleOnDisconnect]);
 
   return {
     socket,

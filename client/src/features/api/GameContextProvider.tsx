@@ -39,6 +39,7 @@ export default function APIProvider({ children }: { children: React.ReactNode })
       s.off("newError", updateError);
       s.off("newPhase", updatePhase);
       s.off("newPlayers", updatePlayers);
+      s.off("sendPlayerId", updateYourId);
 
       setActions({
         setPlayerName: () => {},

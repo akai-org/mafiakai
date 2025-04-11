@@ -19,8 +19,7 @@ export default function socketRoutes(socket: MASocket) {
 
   socket.on("disconnect", () => room.game.leave(playerId));
 
-  setTimeout(() => {
-    room.game._state.updatePhase(room.game);
-    socket.emit("sendPlayerId", playerId); // Send the player ID to the client
-  }, 1000);
+  // Initial event emission to the client
+  socket.emit("sendPlayerId", playerId);
+  room.game._state.updatePhase(room.game);
 }

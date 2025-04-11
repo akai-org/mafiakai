@@ -1,6 +1,5 @@
 import { MAServer } from "@/types";
 import { Server } from "socket.io";
-import { instrument } from "@socket.io/admin-ui";
 import { httpServer } from "./httpServer";
 
 const development_socketio_proxies =
@@ -15,9 +14,14 @@ export const socketsServer: MAServer = new Server(httpServer, {
   },
 });
 
-if (process.env.NODE_ENV != "production") {
-  instrument(socketsServer, {
-    auth: false,
-    mode: "development",
-  });
+try {
+  if (process.env.NODE_ENV != "production") {
+    const admin_ui = require("@socket.io/admin-ui");
+    admin_ui.instrument(socketsServer, {
+      auth: false,
+      mode: "development",
+    });
+  }
+} catch (error) {
+  console.log('Module @socket.io/admin-ui is not available');
 }

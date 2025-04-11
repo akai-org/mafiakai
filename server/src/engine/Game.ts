@@ -80,6 +80,17 @@ export default class Game {
     player.vote = target;
   }
 
+  name(playerId: string, name: string) {
+    const player = this._players.get(playerId);
+    if (!player) throw new PayloadError("playerNotFound");
+
+    if (!(this._phase.current === Phases.LOBBY)) {
+      throw new PayloadError("gameAlreadyStarted");
+    }
+
+    player.name = name;
+  }
+
   seatAt(playerId: string, seat: number) {
     if (this._phase.current !== Phases.LOBBY) throw new PayloadError("gameAlreadyStarted");
     const player = this._players.get(playerId);

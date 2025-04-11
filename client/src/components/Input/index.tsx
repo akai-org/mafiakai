@@ -1,6 +1,6 @@
 
 import clsx from "clsx";
-import React, { forwardRef, type ComponentPropsWithoutRef } from "react";
+import { forwardRef, type ComponentPropsWithoutRef } from "react";
 
 type InputProps = ComponentPropsWithoutRef<"input">;
 

@@ -1,6 +1,5 @@
-import express from "express";
 import { manager } from "@/constants/manager";
-import { socketsServer } from "./socketServer";
+import express from "express";
 
 const webRouter = express.Router();
 

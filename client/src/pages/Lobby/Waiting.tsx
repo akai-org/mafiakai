@@ -1,27 +1,18 @@
 import { Button } from "@/components";
-
-type PlayerInfo = {
-  name: string;
-  seat: number | null;
-  isReady: boolean;
-};
-
-type DisplayPlayersProps = {
-  players: string[];
-};
-
-type WaitingProps = {
-  playername: string[];
-};
+import { ApiContext } from "@/features/api/GameContext";
+import { useYourself } from "@/hooks/useYourself";
+import { useContext, useMemo } from "react";
 
 function ReadyIndicator({ ready }: { ready: boolean }) {
   return <div className={`mr-2 h-5 w-5 rounded-full ${ready ? "bg-green-600" : "bg-red-600"}`}></div>;
 }
 
-function DisplayPlayers({ players }: DisplayPlayersProps) {
+function DisplayPlayers() {
+  const { state } = useContext(ApiContext);
+
   return (
     <ul className="select-none">
-      {players.map((name, i) => {
+      {state.players.map((p, i) => {
         const ready = i % 2 === 0;
         return (
           <li
@@ -29,7 +20,7 @@ function DisplayPlayers({ players }: DisplayPlayersProps) {
             className={`my-4 flex items-center text-lg transition-all hover:ml-2 hover:text-xl hover:font-semibold ${!ready ? "text-gray-500" : ""}`}
           >
             <ReadyIndicator ready={ready} />
-            {name}
+            {p.name}
           </li>
         );
       })}
@@ -37,39 +28,18 @@ function DisplayPlayers({ players }: DisplayPlayersProps) {
   );
 }
 
-function Waiting({ playername }: WaitingProps) {
-  const player: PlayerInfo = { name: playername[0], seat: null, isReady: false };
+function Waiting() {
+  const player = useYourself();
+  const canBeReady = useMemo(() => [player.name, player.seat, player.persona.name].every((v) => v !== null), [player]);
+
   return (
     <div className="flex h-full w-full flex-col justify-between p-4">
       <p className="flex-shrink-0 text-base">Be patient {player.name}, the citizens are getting ready...</p>
       <div className="my-2 flex max-h-[calc(100vh-16rem)] flex-col overflow-y-auto rounded-md bg-neutral-100 px-4 shadow-inner">
-        <DisplayPlayers
-          players={[
-            player.name,
-            "Kasia",
-            "Marek",
-            "Krzysztof",
-            "Ania",
-            "Michał",
-            "Natalia",
-            "Piotr",
-            "Karolina",
-            "Tomasz",
-            "Klaudia",
-            "Kamil",
-            "Monika",
-            "Jakub",
-            "Magda",
-            "Adam",
-            "Ewa",
-            "Robert",
-            "Agnieszka",
-            "Łukasz",
-          ]}
-        />
+        <DisplayPlayers />
       </div>
       <div className="group relative mt-4 flex-shrink-0">
-        <Button size="button-lg" disabled={!player.name || player.seat === null} className="w-full">
+        <Button size="button-lg" disabled={!canBeReady} className="w-full">
           Ready
         </Button>
         <span

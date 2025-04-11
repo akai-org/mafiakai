@@ -1,9 +1,8 @@
-import { Button, Input, Modal } from "@/components";
-import { ApiContext } from "@/features/api/GameContext";
 import useKeyDown from "@/hooks/useKeyDown";
 import useSwipe from "@/hooks/useSwipe";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useState } from "react";
 import Character from "./Character";
+import ModalPlayerName from "./ModalPlayerName";
 import Seat from "./Seats";
 import Waiting from "./Waiting";
 
@@ -55,29 +54,9 @@ function Lobby() {
     });
   };
 
-  const { actions } = useContext(ApiContext);
-
-  const [playerName, setPlayerName] = useState<string>("");
-  const [isModalOpened, setIsModalOpened] = useState(true);
-  const playerNameLength = playerName?.trim().length;
-
-  const handleNameConfirmation = () => {
-    if (playerNameLength > 1) {
-      actions.setPlayerName(playerName);
-      setIsModalOpened(false);
-    }
-  };
-
   return (
     <>
-      <Modal canBeDismissed={false} showCloseIcon={false} isOpened={isModalOpened}>
-        <h2 className="mt-3 text-2xl font-bold">Enter your name</h2>
-        <p className="text-center">This will help other players bind your name with your character.</p>
-        <Input type="text" value={playerName} onChange={(e) => setPlayerName(e.target.value)} className="my-2" />
-        <Button disabled={!(playerNameLength > 1)} onClick={handleNameConfirmation}>
-          Confirm
-        </Button>
-      </Modal>
+      <ModalPlayerName />
 
       <div className="flex h-full max-w-md select-none flex-col border-2">
         <div className="flex justify-between p-4">
@@ -102,8 +81,7 @@ function Lobby() {
             <Seat players={players} selectSeat={handleSetPosition} yourSeat={null} />
           )}
           {panelsValues[panelId] === Panels.Character ? <Character /> : <></>}
-          {panelsValues[panelId] === Panels.Waiting ? <Waiting playername={players} /> : <></>}
-          {panelsValues[panelId] === Panels.Character && <Character />}
+          {panelsValues[panelId] === Panels.Waiting ? <Waiting /> : <></>}
         </div>
       </div>
     </>

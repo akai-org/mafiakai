@@ -1,22 +1,28 @@
-import { useContext, useEffect, useState } from "react";
-import { ConnContext } from "@/ConnectionProvider/Context";
-import { Phases } from "@global/Game";
+import { ApiContext } from "@/features/api/GameContext";
+import Lobby from "@/pages/Lobby";
+import { Phases } from "@global/Phases";
+import { useContext } from "react";
 
 function Game() {
-  const { socket } = useContext(ConnContext);
-
-  const [phase, setPhase] = useState(Phases.GAME_END);
-
-  useEffect(() => {
-    socket.on("phaseChange", (data: Phases) => setPhase(data));
-  }, [socket]);
+  const { state, connection } = useContext(ApiContext);
 
   // Render certain components based on the game phase
-  return (
-    <div>
-      <h1>Room is in phase {phase}</h1>
-    </div>
-  );
+
+  switch (state.phase) {
+    case Phases.LOBBY:
+      return <Lobby />;
+
+    default:
+      return (
+        <div>
+          Placeholder for phase {state.phase}
+          <br />
+          Connection status {connection.status}
+          <br />
+          Error {connection.connectionError}
+        </div>
+      );
+  }
 }
 
 export default Game;

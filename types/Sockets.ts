@@ -1,23 +1,42 @@
-import type { Phases } from "./Game";
+import type { GameModel } from "./GameModel";
+import type { Persona } from "./Persona";
 
 export interface Server2ClientEvents {
-  rooms: (rooms: Array<String>) => void;
-  info: (data: string) => void;
-  phaseChange: (phase: Phases) => void;
+  // Connection
+  sendPlayerId: (playerId: string) => void;
+
+  // GameModel
+  newPhase: (phase: GameModel["phase"]) => void;
+  newTimer: (timer: GameModel["timer"]) => void;
+  newLastKilled: (playerId: GameModel["lastKilled"]) => void;
+  newPlayers: (players: GameModel["players"]) => void;
+  newError: (error: GameModel["error"]) => void;
 }
 
-export type ResponseHandler = (message: string) => void;
+export type ConnectionInfoData = { [PLAYER_ID_KEY_NAME]: string };
 
 export interface Client2ServerEvents {
-  setPosition: (position: number, callback: ResponseHandler) => void;
-  vote: (data: string) => void;
+  // Lobby management
+  setPlayerName(playerName: string): void;
+  setSeat(seatNumber: number): void;
+  updatePersona(persona: Partial<Persona>): void;
+
+  // Game management
+  setReady(readiness: boolean): void;
+  vote(playerName: string): void;
+
+  check(playerName: string): void; // Detective check
+  protect(playerName: string): void; // Bodyguard protect
 }
 
 export interface InterServerEvents {
   ping: () => void;
 }
 
+export const PLAYER_ID_KEY_NAME = "playerId";
+export const ROOM_CODE_KEY_NAME = "roomCode";
+
 export interface SocketData {
-  name: string;
-  age: number;
+  [PLAYER_ID_KEY_NAME]: string;
+  [ROOM_CODE_KEY_NAME]: string;
 }

@@ -13,13 +13,14 @@ export default function socketRoutes(socket: MASocket) {
 
   // Bind game events to socket events
   socket.on("setReady", (readiness) => room.game.ready(socket.data.playerId, readiness));
-  socket.on("setSeat", (position: number) => room.game._players.seatAt(socket.data.playerId, position));
-  socket.on("setPlayerName", (name: string) => room.game._players.setNameFor(socket.data.playerId, name));
+  socket.on("setSeat", (position: number) => room.game.seatAt(socket.data.playerId, position));
+  socket.on("setPlayerName", (name: string) => room.game.name(socket.data.playerId, name));
   socket.on("vote", (targetId: string) => room.game.vote(socket.data.playerId, targetId));
 
   socket.on("disconnect", () => room.game.leave(playerId));
 
   setTimeout(() => {
     room.game._state.updatePhase(room.game);
+    socket.emit("sendPlayerId", playerId); // Send the player ID to the client
   }, 1000);
 }

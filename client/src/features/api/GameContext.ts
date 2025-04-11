@@ -1,6 +1,7 @@
 import type { GameModel } from "@global/GameModel";
 import { createContext } from "react";
 import type useSocket from "./useSocket";
+import { Phases } from "@global/Phases";
 
 interface GameContext {
   // Recive data from the server
@@ -17,7 +18,14 @@ interface GameContext {
 }
 
 export const initialState: GameContext = {
-  state: {} as GameModel,
+  state: {
+    players: [],
+    yourId: "",
+    phase: Phases.LOBBY,
+    error: null,
+    lastKilled: null,
+    timer: { start_at: 0, end_at: 0 },
+  },
   connection: {} as ReturnType<typeof useSocket>,
   actions: {
     setReady: () => {},

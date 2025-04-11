@@ -62,6 +62,8 @@ export default class Game {
 
     if (player.persona === null || player.seat === null) throw new PayloadError("playerCannotBeReady");
     player.isReady = value;
+
+    this.update();
   }
 
   vote(playerId: string, target: string) {
@@ -78,6 +80,7 @@ export default class Game {
     if (!targetPlayer.alive) throw new PayloadError("targetIsDead");
 
     player.vote = target;
+    this.update();
   }
 
   name(playerId: string, name: string) {
@@ -89,6 +92,7 @@ export default class Game {
     }
 
     player.name = name;
+    this.update();
   }
 
   seatAt(playerId: string, seat: number) {
@@ -97,6 +101,7 @@ export default class Game {
     if (!player) throw new PayloadError("playerNotFound");
 
     this._players.seatAt(playerId, seat);
+    this.update();
   }
 
   describePlayer(playerId: string, persona: Persona) {
@@ -105,6 +110,7 @@ export default class Game {
     if (!player) throw new PayloadError("playerNotFound");
 
     player.persona = persona;
+    this.update();
   }
 
   // ########################### //

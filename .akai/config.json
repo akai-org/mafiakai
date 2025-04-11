@@ -1,0 +1,32 @@
+{
+  "name": "MafiAKAI",
+  "technologies": ["Vite", "TailwindCSS", "Socket.io", "Express"],
+  "description_pl": "Przeniesienie kanapowej Mafii do aplikacji webowej",
+  "description_en": "Porting Mafia from a couch game to a web application",
+  "contributors": [
+    {
+      "name": "Franciszek Kaczmarek",
+      "url": "https://github.com/mit3r"
+    },
+    {
+      "name": "Tomasz Pawłowski",
+      "url": "https://github.com/NiebieskiRekin"
+    },
+    {
+      "name": "Aleksander Nowicki",
+      "url": "https://github.com/Aleks334"
+    },
+    {
+      "name": "Michał Kaczor",
+      "url": "https://github.com/MKaczor24"
+    },
+    {
+      "name": "Eryk Bielawski",
+      "url": "https://github.com/erybie222"
+    },
+    {
+      "name": "Adam Pawełka",
+      "url": "https://github.com/adampawelka"
+    }
+  ]
+}

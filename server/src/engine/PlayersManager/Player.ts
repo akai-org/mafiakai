@@ -4,7 +4,12 @@ import { Roles } from "@global/Roles";
 
 export class Player implements PlayerModel {
   online: boolean = true;
-  persona: Persona = {};
+  persona: Persona = {
+    name: "",
+    profession: "",
+    description: "",
+    preferences: "",
+  };
   role: Roles | null = null;
   guarded: boolean = false;
   checked: boolean = false; // Detective checked this player

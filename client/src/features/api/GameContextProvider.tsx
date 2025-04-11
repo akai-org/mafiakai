@@ -29,6 +29,7 @@ export default function APIProvider({ children }: { children: React.ReactNode })
     s.on("sendPlayerId", updateYourId);
 
     setActions({
+      setPersona: (persona) => s.emit("updatePersona", persona),
       setPlayerName: (name) => s.emit("setPlayerName", name),
       setSeat: (seat) => s.emit("setSeat", seat),
       setReady: (ready) => s.emit("setReady", ready),

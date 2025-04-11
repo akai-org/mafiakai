@@ -109,7 +109,7 @@ export default class Game {
     const player = this._players.get(playerId);
     if (!player) throw new PayloadError("playerNotFound");
 
-    player.persona = persona;
+    player.persona = { ...persona };
     this.update();
   }
 

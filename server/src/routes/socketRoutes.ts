@@ -1,5 +1,6 @@
 import { manager } from "@/constants/manager";
 import { MASocket } from "@/types";
+import { Persona } from "@global/Persona";
 
 // Here we set up the socket events for the client
 export default function socketRoutes(socket: MASocket) {
@@ -16,6 +17,7 @@ export default function socketRoutes(socket: MASocket) {
   socket.on("setSeat", (position: number) => room.game.seatAt(socket.data.playerId, position));
   socket.on("setPlayerName", (name: string) => room.game.name(socket.data.playerId, name));
   socket.on("vote", (targetId: string) => room.game.vote(socket.data.playerId, targetId));
+  socket.on("updatePersona", (persona: Persona) => room.game.describePlayer(socket.data.playerId, persona));
 
   socket.on("disconnect", () => room.game.leave(playerId));
 

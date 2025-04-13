@@ -8,20 +8,20 @@ export default function socketRoutes(socket: MASocket) {
   const playerId = socket.data.playerId;
   console.log(`Player ${playerId} joined room ${room.code}`);
 
-  room.game.join(playerId); // Join the game
+  room.game.execute("join", playerId); // Join the game
   socket.join(room.code); // Join socket.io room
   socket.join(playerId); // Join socket.io room for the player
 
   // Bind game events to socket events
-  socket.on("setReady", (readiness) => room.game.ready(socket.data.playerId, readiness));
-  socket.on("setSeat", (position: number) => room.game.seatAt(socket.data.playerId, position));
-  socket.on("setPlayerName", (name: string) => room.game.name(socket.data.playerId, name));
-  socket.on("vote", (targetId: string) => room.game.vote(socket.data.playerId, targetId));
-  socket.on("updatePersona", (persona: Persona) => room.game.describePlayer(socket.data.playerId, persona));
+  socket.on("setReady", (readiness) => room.game.execute("ready", socket.data.playerId, readiness));
+  socket.on("setSeat", (position: number) => room.game.execute("seatAt", socket.data.playerId, position));
+  socket.on("setPlayerName", (name: string) => room.game.execute("name", socket.data.playerId, name));
+  socket.on("vote", (targetId: string) => room.game.execute("vote", socket.data.playerId, targetId));
+  socket.on("updatePersona", (persona: Persona) => room.game.execute("describePlayer", socket.data.playerId, persona));
 
-  socket.on("disconnect", () => room.game.leave(playerId));
+  socket.on("disconnect", () => room.game.execute("leave", playerId));
 
   // Initial event emission to the client
   socket.emit("sendPlayerId", playerId);
-  room.game._state.updatePhase(room.game);
+  room.game._output.updatePhase(room.game);
 }

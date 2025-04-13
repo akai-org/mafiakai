@@ -36,6 +36,16 @@ export default function APIProvider({ children }: { children: React.ReactNode })
       vote: (vote) => s.emit("vote", vote),
     });
 
+    // DEV ONLY <user>;<persona>;<seat>;<isReady>
+    const str = sessionStorage.getItem("test");
+    if (str !== null) {
+      const [name, personaName, seat, isReady] = str.split(";");
+      if (name) s.emit("setPlayerName", name);
+      if (personaName) s.emit("updatePersona", { name: personaName });
+      if (seat) s.emit("setSeat", Number(seat));
+      if (isReady) s.emit("setReady", isReady === "true");
+    }
+
     return () => {
       s.off("newTimer", updateTimer);
       s.off("newLastKilled", updateLastKilled);

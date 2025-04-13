@@ -15,4 +15,8 @@ const payloadErrors = [
   "youCannotVoteNow",
   "playerIsAlreadyConnected",
   "playerCannotBeReady",
+  "playerAlreadySeated",
+  "playerNotSeated",
+  "undefinedCall",
+  "seatNotFound",
 ] as const;

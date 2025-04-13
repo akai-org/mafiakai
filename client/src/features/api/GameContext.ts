@@ -13,7 +13,7 @@ interface GameContext {
   actions: {
     setPersona: (persona: Persona) => void;
     setReady: (ready: boolean) => void;
-    setSeat: (seatNumber: number) => void;
+    setSeat: (seatNumber: number | null) => void;
     setPlayerName: (name: string) => void;
     vote: (targetId: string) => void;
   };

@@ -1,30 +1,30 @@
 import { Button, Input, Modal } from "@/components";
 import { ApiContext } from "@/features/api/GameContext";
-import { useContext, useState } from "react";
+import { useYourself } from "@/hooks/useYourself";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 export default function ModalPlayerName() {
   const { actions } = useContext(ApiContext);
+  const self = useYourself();
 
   const [playerName, setPlayerName] = useState<string>("");
   const [isModalOpened, setIsModalOpened] = useState(true);
-  const playerNameLength = playerName?.trim().length;
+  const playerNameLength = useMemo(() => playerName.trim().length, [playerName]);
 
   const handleSetPlayerName = (e: React.ChangeEvent<HTMLInputElement>) => setPlayerName(e.target.value);
 
-  const handleNameConfirmation = () => {
-    if (playerNameLength > 1) {
-      actions.setPlayerName(playerName);
-      setIsModalOpened(false);
-    }
-  };
+  const handleNameConfirmation = useCallback(() => {
+    if (playerNameLength <= 1) return;
+    actions.setPlayerName(playerName);
+    setIsModalOpened(false);
+  }, [actions, playerName, playerNameLength]);
 
   const onEnterDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      e.stopPropagation();
-      handleNameConfirmation();
-    }
+    e.stopPropagation();
+    if (e.key === "Enter") handleNameConfirmation();
   };
+
+  useEffect(() => setIsModalOpened(self.name === null), [self.name]);
 
   return (
     <Modal canBeDismissed={false} showCloseIcon={false} isOpened={isModalOpened}>

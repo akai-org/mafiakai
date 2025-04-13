@@ -26,16 +26,16 @@ export class PhasesManager {
   update(game: Game): void {
     const nextPhase = this.phaseHandlers[this._phase].transition(game, !game._timer.running);
 
-    game._state.updatePhase(game);
-    game._state.updatePlayers(game);
-    game._state.updateLastKilled(game);
+    game._output.updatePhase(game);
+    game._output.updatePlayers(game);
+    game._output.updateLastKilled(game);
     if (nextPhase === null) return;
 
     this._phase = nextPhase;
     this.phaseHandlers[nextPhase].onEnter(game);
-    game._state.updatePhase(game);
-    game._state.updatePlayers(game);
-    game._state.updateLastKilled(game);
+    game._output.updatePhase(game);
+    game._output.updatePlayers(game);
+    game._output.updateLastKilled(game);
 
     const duration = this.phaseHandlers[nextPhase].duration;
     if (duration !== null && duration > 0) game._timer.start(duration, () => this.update(game));

@@ -4,17 +4,15 @@
 import useCircleCapture from "@/hooks/useCircleCapture";
 import useKeyDown from "@/hooks/useKeyDown";
 import { mod } from "@/utils/mod";
-import clsx from "clsx";
-import { useEffect, useMemo, useState } from "react";
+import { clsx } from "clsx";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 /**
  * Input shaped like a clock, with a pointer that can be moved around the clock face.
  */
 export default function ClockInput<V>(props: {
   labels: V[];
-  // Selection handling
-  onSelect?: (seat: V) => void;
-  // Render bubbles
+  onSelect?: () => void;
   bubbleElement: (i: number, seat: V | null, pointed: boolean) => JSX.Element;
   // Controll input from outside
   value?: number;
@@ -24,39 +22,30 @@ export default function ClockInput<V>(props: {
   const valueMod = useMemo(() => mod(props.value ?? 0, props.labels.length), [props.value, props.labels.length]);
 
   // Mouse arrow value
-  const [circleRef, slide] = useCircleCapture(props.labels.length, 180 / props.labels.length);
+  const [circleRef, slideMod] = useCircleCapture(props.labels.length, -90 + 180 / props.labels.length);
 
   // Arrow position
   const [arrow, setArrow] = useState<number>(0);
+  const handleArrow = useCallback(
+    (n: number) => setArrow((p) => calcArrowPosition(p, n, props.labels.length)),
+    [props.labels.length]
+  );
   const arrowMod = useMemo(() => mod(arrow, props.labels.length), [arrow, props.labels.length]);
 
-  // Update arrow by props
   useEffect(() => {
-    if (valueMod === arrowMod) return;
-    setArrow((p) => calcArrowPosition(p, valueMod, props.labels.length));
-  }, [props.value]);
+    if (props.labels.length === 0) return;
+    handleArrow(slideMod);
+    if (props.onChange) props.onChange(slideMod);
+  }, [slideMod, props.labels.length]);
 
-  // Update arrow by labels
   useEffect(() => {
-    if (valueMod === arrowMod) return;
-    setArrow((p) => calcArrowPosition(p, valueMod, props.labels.length));
-  }, [props.labels.length]);
-
-  // Update arrow by mouse
-  useEffect(() => {
-    if (slide === arrowMod) return;
-    setArrow((p) => calcArrowPosition(p, slide, props.labels.length));
-    if (props.onChange) props.onChange(slide); // Update parent
-  }, [slide]);
-
-  // Select seat
-  const handleSelectSeat = () => {
-    const playerNext = props.labels[valueMod + 1];
-    if (playerNext && props.onSelect) props.onSelect(playerNext);
-  };
+    if (props.labels.length === 0) return;
+    handleArrow(props.value ?? 0);
+    if (props.onChange) props.onChange(props.value ?? 0);
+  }, [props.value, props.labels.length]);
 
   useKeyDown({
-    Enter: handleSelectSeat,
+    Enter: props.onSelect,
   });
 
   return (
@@ -71,7 +60,7 @@ export default function ClockInput<V>(props: {
               props.labels.length < 24 ? "w-[12%]" : "w-[10%]"
             )}
             style={{
-              transform: ` rotate(${i / props.labels.length}turn) ${props.labels.length < 24 ? "translate(310%)" : "translate(390%)"} ${arrowMod === i ? "translateX(50%)" : ""} rotate(${-i / props.labels.length}turn)`,
+              transform: ` rotate(${0.25 + i / props.labels.length}turn) ${props.labels.length < 24 ? "translate(310%)" : "translate(390%)"} ${arrowMod === i ? "translateX(50%)" : ""} rotate(${-0.25 - i / props.labels.length}turn)`,
               zIndex: 2 - ((i + 0) % 2),
             }}
           >
@@ -81,13 +70,13 @@ export default function ClockInput<V>(props: {
       })}
 
       {/* Clock face */}
-      <div ref={circleRef} onClick={handleSelectSeat} className="aspect-square w-[90%] rounded-full bg-neutral-300" />
+      <div ref={circleRef} onClick={props.onSelect} className="aspect-square w-[90%] rounded-full bg-neutral-300" />
 
       {/* Arrow */}
       <div
         className="pointer-events-none absolute z-0 h-[2px] w-[37.2%] origin-left bg-neutral-600 transition-all"
         style={{
-          transform: `translateX(50%) rotate(${arrow / props.labels.length}turn)`,
+          transform: `translateX(50%) rotate(${0.25 + arrow / props.labels.length}turn)`,
         }}
       />
 

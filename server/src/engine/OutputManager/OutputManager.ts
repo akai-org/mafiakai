@@ -1,22 +1,12 @@
-// export class StateManager<State extends Record<string, any>> {
-//   private handlers: Partial<{ [key in keyof State]: (value: State[key]) => void }> = {};
-//   on<P extends keyof State>(property: P, callback: (value: State[P]) => void) {
-//     this.handlers[property] = callback;
-//   }
-//   emit<P extends keyof State>(property: P, value: State[P]) {
-//     const handler = this.handlers[property];
-//     if (handler) handler(value);
-//   }
-// }
-
 import { PlayerModel } from "@global/PlayerModel";
 import { Roles } from "@global/Roles";
 import { Player } from "../PlayersManager/Player";
 import { InternalError } from "../InternalError";
 import Game from "../Game";
 
-export class StateManager {
+export class OutputManager {
   updateError(game: Game, playerdId: string | null, error: Error) {
+    console.error(error);
     game.onerror(playerdId, error);
   }
 

@@ -6,7 +6,6 @@ import Game from "../Game";
 
 export class OutputManager {
   updateError(game: Game, playerdId: string | null, error: Error) {
-    console.error(error);
     game.onerror(playerdId, error);
   }
 

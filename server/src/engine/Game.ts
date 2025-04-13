@@ -6,6 +6,7 @@ import { OutputManager } from "./OutputManager/OutputManager";
 import { PhasesManager } from "./PhasesManager/PhasesManager";
 import { Timer } from "./PhasesManager/Timer";
 import { PlayersManager } from "./PlayersManager/PlayersManager";
+import { InternalError } from "./InternalError";
 
 export default class Game {
   // "Private"
@@ -42,7 +43,7 @@ export default class Game {
     } catch (error) {
       if (error instanceof PayloadError) return this._output.updateError(this, args[0], error);
 
-      throw error;
+      if (error instanceof InternalError) console.error(error.name);
     } finally {
       this.update();
     }

@@ -62,10 +62,15 @@ export class PlayersManager {
   dropSeat(playerId: string) {
     const player = this.get(playerId);
     if (!player) throw new InternalError("playerNotFound");
-    if (player.seat === null) return; // There should be error
-    // you cannot drop a seat if you are not seated
 
-    for (const p of this.all) if (p.seat !== null && p.seat > player.seat) p.seat--;
+    // you cannot drop a seat if you are not seated
+    if (player.seat === null) throw new PayloadError("playerNotSeated");
+
+    // you cannot drop a seat if you are not the last player seated
+    const seated = this.all.filter((p) => p.seat !== null);
+    if (seated.length <= 1) throw new PayloadError("cannotDropYourSeatAlone");
+
+    for (const p of seated) if (p.seat !== null && p.seat > player.seat) p.seat--;
     player.seat = null;
   }
 

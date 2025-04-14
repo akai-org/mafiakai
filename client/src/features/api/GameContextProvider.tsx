@@ -1,6 +1,6 @@
 import type { CustomSocket } from "@/types/Socket";
 import type { GameModel } from "@global/GameModel";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ApiContext, initialState } from "./GameContext";
 import useSocket from "./useSocket";
 
@@ -8,6 +8,10 @@ export default function APIProvider({ children }: { children: React.ReactNode })
   // const [buffor, setBuffor] = useState<GameModel>(initialState.state); Maybe some day
   const [state, setState] = useState<GameModel>(initialState.state);
   const [actions, setActions] = useState(initialState.actions);
+
+  useEffect(() => {
+    if (state.error) console.log(`Error: %c ${state.error.text}`, "color: #FF63C1");
+  }, [state.error]);
 
   const update = (key: keyof GameModel) => (value: GameModel[typeof key]) =>
     setState((prev) => ({ ...prev, [key]: value }));

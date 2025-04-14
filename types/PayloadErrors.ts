@@ -1,7 +1,10 @@
 export class PayloadError extends Error {
+  text: (typeof payloadErrors)[number];
+
   constructor(message: (typeof payloadErrors)[number]) {
     super(message);
     this.name = "PayloadError";
+    this.text = message;
   }
 }
 
@@ -19,4 +22,6 @@ const payloadErrors = [
   "playerNotSeated",
   "undefinedCall",
   "seatNotFound",
+  "cannotDropYourSeatAlone",
+  "cannotDrop",
 ] as const;

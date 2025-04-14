@@ -18,8 +18,9 @@ function Character() {
   });
 
   useEffect(() => {
-    if (!changed) setData(you.persona);
-  }, [changed, you.persona]);
+    if (!changed) setData((p) => ({ ...p, ...you.persona }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [you.persona]);
 
   const canDraw = useMemo(() => data.name.length > 3 && data.profession.length > 3, [data]);
 

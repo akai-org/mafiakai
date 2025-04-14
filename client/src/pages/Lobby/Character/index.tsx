@@ -9,10 +9,6 @@ function Character() {
   const { actions } = useContext(ApiContext);
   const you = useYourself();
 
-  useEffect(() => {
-    setData(you.persona);
-  }, [you.persona]);
-
   const [changed, setChanged] = useState(false);
   const [data, setData] = useState<Persona>({
     name: "",
@@ -20,6 +16,10 @@ function Character() {
     description: "",
     preferences: "",
   });
+
+  useEffect(() => {
+    if (!changed) setData(you.persona);
+  }, [changed, you.persona]);
 
   const canDraw = useMemo(() => data.name.length > 3 && data.profession.length > 3, [data]);
 
@@ -35,8 +35,8 @@ function Character() {
   };
 
   return (
-    <form className="flex h-full w-full flex-col justify-between p-4" onSubmit={handleSubmit}>
-      <div className="flex w-full flex-col gap-y-4">
+    <form className="flex min-h-full w-full flex-col justify-between gap-y-4 p-4" onSubmit={handleSubmit}>
+      <div className="flex h-full w-full flex-col gap-y-4">
         <p className="text-justify">
           Create your character and choose your preferred role (your choice will be considered in the drawing)
         </p>

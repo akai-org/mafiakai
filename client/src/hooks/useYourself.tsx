@@ -11,7 +11,7 @@ export function useYourself() {
     state.players.find((player) => player.id === state.yourId) ??
     ({
       id: "",
-      name: "",
+      name: null,
       persona: {
         name: "",
         profession: "",

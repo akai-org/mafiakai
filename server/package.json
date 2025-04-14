@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "test": "tsx --test --env-file .env.tests tests",
+    "dev": "tsx watch --env-file=.env src/index.ts",
+    "test": "tsx --env-file .env.tests --test tests",
     "test:file": "tsx --test --env-file .env.tests"
   },
   "//": [

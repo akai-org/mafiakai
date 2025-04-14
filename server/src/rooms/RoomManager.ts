@@ -7,23 +7,8 @@ export class RoomManager {
 
   constructor() {
     // Create the default test rooms
-    const roomsCodes = ["000000", "000001"];
-    for (const code of roomsCodes) this.create(code);
-
-    const r1 = this.rooms.get("000001");
-    if (!r1) return;
-
-    const p1 = this.generatePlayerId();
-    r1.game.execute("join", p1);
-    r1.game.execute("name", p1, "Player 1");
-    r1.game.execute("seatAt", p1, 0);
-    r1.game.execute("ready", p1, true);
-
-    const p2 = this.generatePlayerId();
-    r1.game.execute("join", p2);
-    r1.game.execute("name", p2, "Player 2");
-    r1.game.execute("seatAt", p2, 0);
-    r1.game.execute("ready", p2, true);
+    this.createTestRoom("000000", 0);
+    this.createTestRoom("000001", 3);
   }
 
   // unique 5 digits room code
@@ -48,5 +33,17 @@ export class RoomManager {
 
   getRoom(code: string): Room | undefined {
     return this.rooms.get(code);
+  }
+
+  createTestRoom(code: string, players: number, names: string[] = []): Room {
+    const room = this.create(code);
+    for (let i = 0; i < players; i++) {
+      const playerId = this.generatePlayerId();
+      room.game.execute("join", playerId);
+      room.game.execute("name", playerId, names[i] ?? `Player ${i + 1}`);
+      room.game.execute("seatAt", playerId, i);
+      room.game.execute("ready", playerId, true);
+    }
+    return room;
   }
 }

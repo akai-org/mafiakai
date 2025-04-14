@@ -38,6 +38,7 @@ export class PhasesManager {
     game._output.updateLastKilled(game);
 
     const duration = this.phaseHandlers[nextPhase].duration;
+    console.log(`Phase changed to ${nextPhase}`, duration);
     if (duration !== null && duration > 0) game._timer.start(duration, () => this.update(game));
   }
 }

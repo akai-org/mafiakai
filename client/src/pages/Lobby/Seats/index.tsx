@@ -65,7 +65,7 @@ export default function Seat() {
           Reserve your place
         </Button>
       ) : (
-        <Button size="button-lg" onClick={handleDrop}>
+        <Button size="button-lg" disabled={players.length === 1} onClick={handleDrop}>
           Drop your seat
         </Button>
       )}

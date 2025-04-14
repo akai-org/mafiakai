@@ -36,7 +36,7 @@ function Lobby() {
         <div className="flex border-b-2 border-neutral-800">
           {panelsValues.map((panelName, i) => (
             <button
-              className={`w-full rounded-t-2xl py-1 transition-colors ${i === panelId ? "bg-neutral-800 text-white" : ""}`}
+              className={`w-full rounded-t-2xl py-1 outline-none transition-colors ${i === panelId ? "bg-neutral-800 text-white" : ""}`}
               onClick={() => setPanel(i)}
               key={panelName}
             >
@@ -46,8 +46,8 @@ function Lobby() {
         </div>
 
         <div className="h-full overflow-y-auto" ref={swipeRef}>
-          {panelsValues[panelId] === Panels.Seat && <Seat />}
           {panelsValues[panelId] === Panels.Character ? <Character /> : <></>}
+          {panelsValues[panelId] === Panels.Seat && <Seat />}
           {panelsValues[panelId] === Panels.Waiting ? <Waiting /> : <></>}
         </div>
       </div>

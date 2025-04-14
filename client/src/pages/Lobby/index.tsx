@@ -26,9 +26,8 @@ function Lobby() {
 
   return (
     <>
-      <ModalPlayerName />
-
-      <div className="flex h-full max-w-md select-none flex-col border-2">
+      <div className="flex h-screen select-none flex-col">
+        <ModalPlayerName />
         <div className="flex justify-between p-4">
           <h1>MafiAKAI</h1>
           <div className="">Options</div>
@@ -46,7 +45,7 @@ function Lobby() {
           ))}
         </div>
 
-        <div className="h-full" ref={swipeRef}>
+        <div className="h-full overflow-y-auto" ref={swipeRef}>
           {panelsValues[panelId] === Panels.Seat && <Seat />}
           {panelsValues[panelId] === Panels.Character ? <Character /> : <></>}
           {panelsValues[panelId] === Panels.Waiting ? <Waiting /> : <></>}

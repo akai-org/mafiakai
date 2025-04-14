@@ -11,7 +11,7 @@ const socket: CustomSocket = io(import.meta.env.VITE_SERVER_URL, {
 function connect() {
   if (socket.connected) return;
 
-  const playerId = localStorage.getItem(PLAYER_ID_KEY_NAME);
+  const playerId = sessionStorage.getItem(PLAYER_ID_KEY_NAME);
   if (playerId) socket.auth = { [PLAYER_ID_KEY_NAME]: playerId };
 
   socket.connect();
@@ -58,6 +58,10 @@ export default function useSocket(initializeSocketHandlers: (socket: CustomSocke
     setStatus("error");
   };
 
+  const handlePlayerId = (playerId: string) => {
+    sessionStorage.setItem(PLAYER_ID_KEY_NAME, playerId);
+  };
+
   const handleOnDisconnect = useCallback((reason: string) => {
     switch (reason) {
       case "io server disconnect":
@@ -78,6 +82,7 @@ export default function useSocket(initializeSocketHandlers: (socket: CustomSocke
     socket.on("connect", handleOnConnection);
     socket.on("disconnect", handleOnDisconnect);
     socket.on("connect_error", handleConnectionError);
+    socket.on("sendPlayerId", handlePlayerId);
 
     connect();
 
@@ -85,6 +90,7 @@ export default function useSocket(initializeSocketHandlers: (socket: CustomSocke
       socket.off("connect", handleOnConnection);
       socket.off("disconnect", handleOnDisconnect);
       socket.off("connect_error", handleConnectionError);
+      socket.off("sendPlayerId", handlePlayerId);
     };
   }, [handleOnDisconnect]);
 

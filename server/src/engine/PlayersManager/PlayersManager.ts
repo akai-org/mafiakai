@@ -2,6 +2,7 @@ import { config } from "@/constants";
 import { Roles } from "@global/Roles";
 import { InternalError } from "../InternalError";
 import { Player } from "./Player";
+import { PayloadError } from "@global/PayloadErrors";
 
 export class PlayersManager {
   private players = new Map<string, Player>();
@@ -13,10 +14,14 @@ export class PlayersManager {
   add(playerId: string): Player {
     const player = new Player(playerId);
     this.players.set(playerId, player);
+
+    const seated = this.all.filter((p) => p.seat !== null);
+    if (seated.length < 1) this.setSeat(playerId, 0);
     return player;
   }
 
   remove(playerId: string) {
+    this.dropSeat(playerId);
     this.players.delete(playerId);
   }
 
@@ -45,28 +50,28 @@ export class PlayersManager {
   }
 
   // Seat management
-  seatAt(playerId: string, seat: number){
-    const player = this.players.get(playerId)
-    if (player === undefined) return false;
+  setSeat(playerId: string, seat: number) {
+    const player = this.get(playerId);
+    if (!player) throw new InternalError("playerNotFound");
+    if (player.seat !== null) throw new PayloadError("playerAlreadySeated");
 
-    const seated = this.all.filter((a)=>!(a.seat === null))
-    let i = Math.max(Math.min(seat,seated.length),0);
-    for (let j of seated){
-      if (j.seat! >= i){
-        j.seat!++;
-      }
-    }
-    player.seat = i;
-    return true;
+    for (const p of this.all) if (p.seat !== null && p.seat >= seat) p.seat++;
+    player.seat = seat;
   }
 
-  // Name management
-
-  setNameFor(playerId: string, name: string) {
+  dropSeat(playerId: string) {
     const player = this.get(playerId);
     if (!player) throw new InternalError("playerNotFound");
 
-    player.name = name;
+    // you cannot drop a seat if you are not seated
+    if (player.seat === null) throw new PayloadError("playerNotSeated");
+
+    // you cannot drop a seat if you are not the last player seated
+    const seated = this.all.filter((p) => p.seat !== null);
+    if (seated.length <= 1) throw new PayloadError("cannotDropYourSeatAlone");
+
+    for (const p of seated) if (p.seat !== null && p.seat > player.seat) p.seat--;
+    player.seat = null;
   }
 
   // Role management

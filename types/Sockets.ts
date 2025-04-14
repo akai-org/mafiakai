@@ -18,7 +18,7 @@ export type ConnectionInfoData = { [PLAYER_ID_KEY_NAME]: string };
 export interface Client2ServerEvents {
   // Lobby management
   setPlayerName(playerName: string): void;
-  setSeat(seatNumber: number): void;
+  setSeat(seatNumber: number | null): void;
   updatePersona(persona: Partial<Persona>): void;
 
   // Game management

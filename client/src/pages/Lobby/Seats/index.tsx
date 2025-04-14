@@ -1,7 +1,9 @@
 import { Button } from "@/components";
 import useKeyDown from "@/hooks/useKeyDown";
-import { useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 
+import { ApiContext } from "@/features/api/GameContext";
+import { useYourself } from "@/hooks/useYourself";
 import { mod } from "@/utils/mod";
 import ClockInput from "./ClockInput";
 import FreeBubble from "./FreeBubble";
@@ -10,69 +12,81 @@ import PlayerBubble from "./PlayerBubble";
 
 export type Seat = { id: number; name: string } | null;
 
-function Seat(props: { selectSeat(i: number): void; players: string[]; yourSeat: number | null }) {
-  // Seats array
-  const seats = useMemo<Seat[]>(() => calcSeats(props.players, props.yourSeat), [props.players, props.yourSeat]);
+export default function Seat() {
+  const { state, actions } = useContext(ApiContext);
+  const self = useYourself();
+
+  const players = useMemo(
+    () =>
+      state.players
+        .filter((p) => p.seat !== null)
+        .sort((a, b) => a.seat! - b.seat!)
+        .map((p) => p.name ?? "Nieznany"),
+    [state.players]
+  );
+
+  const seats = useMemo<Seat[]>(() => calcSeats2(players, self.seat), [players, self.seat]);
 
   const [pointer, setPointer] = useState<number>(0);
 
-  // Keyboard navigation
   useKeyDown({
     ArrowUp: () => setPointer((p) => mod(p - 1, seats.length)),
     ArrowDown: () => setPointer((p) => mod(p + 1, seats.length)),
   });
 
+  const handleReserve = () => {
+    const s = seats.at(mod(pointer + 1, seats.length));
+    if (s) actions.setSeat(s.id);
+  };
+  const handleDrop = () => actions.setSeat(null);
+
   return (
     <div className="flex h-full flex-col justify-between p-4">
-      <Paragraph arrow={pointer} seats={seats} yourSeat={props.yourSeat} />
+      <Paragraph arrow={pointer} seats={seats} seated={self.seat !== null} />
 
       <div className="relative flex h-1/2 w-full items-center justify-center">
         <ClockInput
           value={pointer}
           onChange={setPointer}
           labels={seats}
-          onSelect={(seat) => seat && props.selectSeat(seat.id)}
+          onSelect={handleReserve}
           bubbleElement={(i, player, isSelected) =>
             player === null ? (
               <FreeBubble key={i} isSelected={isSelected} />
             ) : (
-              <PlayerBubble
-                key={i}
-                isSelected={isSelected}
-                isYourSeat={player.id === props.yourSeat}
-                name={player.name}
-              />
+              <PlayerBubble key={i} isSelected={isSelected} isYourSeat={player.id === self.seat} name={player.name} />
             )
           }
         />
       </div>
 
-      <Button size="button-lg">Reserve your place</Button>
+      {self.seat === null ? (
+        <Button size="button-lg" onClick={handleReserve}>
+          Reserve your place
+        </Button>
+      ) : (
+        <Button size="button-lg" disabled={players.length === 1} onClick={handleDrop}>
+          Drop your seat
+        </Button>
+      )}
     </div>
   );
 }
 
-export default Seat;
+function calcSeats2(players: string[], seat: number | null): (Seat | null)[] {
+  if (seat !== null && seat >= players.length) throw new Error("Seat index out of bounds");
 
-interface PlayerSeat {
-  id: number;
-  name: string;
-}
+  const shift = seat ?? 0;
+  const seats = [];
+  for (let i = shift; i < players.length + shift; i++) {
+    const player = players[mod(i, players.length)];
+    seats.push({ id: players.indexOf(player), name: player });
+    seats.push(null);
+  }
 
-function calcSeats(players: string[], yourSeat: number | null): (PlayerSeat | null)[] {
-  return new Array(players.length * 2 - (yourSeat !== null ? 2 : 0)).fill(null).map((_v, i) => {
-    const isFree = i % 2 === 0;
-    const playerId = Math.floor((i + 1) / 2);
-    if (yourSeat === null) return isFree ? null : { id: playerId - 1, name: players[playerId - 1] };
+  if (seat === null) return seats;
 
-    const edge = yourSeat * 2;
-    if (i == edge + 0) return { id: playerId, name: players[playerId] };
-    if (i == edge + 1) return { id: playerId, name: players[playerId] };
-
-    if (isFree) return null;
-    else {
-      const edgedId = playerId - 1 + (i >= edge ? 1 : 0);
-      return { id: edgedId, name: players[edgedId] };
-    }
-  });
+  const left = mod(0 * 2 - 1, seats.length);
+  const right = mod(0 * 2 + 1, seats.length);
+  return seats.filter((_, i) => i !== left && i !== right);
 }
